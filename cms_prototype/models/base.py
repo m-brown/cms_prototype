@@ -4,6 +4,8 @@ from bson.objectid import ObjectId
 from mongoengine import *
 from mongoengine.base import TopLevelDocumentMetaclass
 
+from pymongo import MongoClient
+
 class VersionedDocumentMetaclass(TopLevelDocumentMetaclass):
 
     def __new__(cls, name, bases, attrs):
@@ -26,9 +28,24 @@ class VersionedDocument(Document):
 
      def save(self, *args, **kwargs):
         Document.save.__doc__
+
+        #generate a new revision
+        if not hasattr(self, '_id'):
+            self._id = ObjectId()
+        self._parent = self._rev
+        self._rev = ObjectId()
+        #save it in the versioning collection
+        nv = self.to_mongo()
+        nv['_id'] = {'id': self._id, 'rev': self._rev}
+        db['versioned_'+self._meta['collection']].insert(nv, safe=True)
+
         return super(VersionedDocument, self).save(*args, **kwargs)
 
 class PublishableDocument(VersionedDocument):
 
     def publish(self, rev):
         raise NotImplementedError
+
+connect('local', host='localhost')
+connection = MongoClient('localhost', 27017)
+db = connection.local
