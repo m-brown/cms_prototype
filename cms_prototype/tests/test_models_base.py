@@ -12,7 +12,12 @@ class VersionedDocument(unittest.TestCase):
 		from cms_prototype.models.base import VersionedDocument
 		v = VersionedDocument()
 		v.save()
+		vid = v.to_mongo()['_id']
 		q = self.db.versioned_document.find()
 		self.assertEqual(q.count(), 1)
-		q = self.db.versioned_document.find({'_id': v.to_mongo()['_id']})
+		q = self.db.versioned_document.find({'_id': vid})
+		self.assertEqual(q.count(), 1)
+		q = self.db.versioned_versioned_document.find()
+		self.assertEqual(q.count(), 1)
+		q = self.db.versioned_versioned_document.find({'_id.id': vid})
 		self.assertEqual(q.count(), 1)
