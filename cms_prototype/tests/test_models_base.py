@@ -14,5 +14,5 @@ class VersionedDocument(unittest.TestCase):
 		v.save()
 		q = self.db.versioned_document.find()
 		self.assertEqual(q.count(), 1)
-		q = self.db.versioned_document.find({'_id': v._id})
+		q = self.db.versioned_document.find({'_id': v.to_mongo()['_id']})
 		self.assertEqual(q.count(), 1)
