@@ -12,9 +12,17 @@ class VersionedDocumentMetaclass(TopLevelDocumentMetaclass):
         super_new = super(VersionedDocumentMetaclass, cls).__new__
 
         attrs.update({
-            '_rev':    ObjectIdField(required=True, default=ObjectId),
-            '_parent': ObjectIdField(),
-            '_ts':     DateTimeField(default=datetime.now),
+            '_rev':         ObjectIdField(required=True, default=ObjectId),
+            '_object_id':   ObjectIdField(required=True),
+            '_parent':      ObjectIdField(),
+            '_ts':          DateTimeField(default=datetime.now),
+            'meta':    {
+                    'indexes': [{
+                        'fields': ['_object_id', '_rev'],
+                        'types': False,
+                        'unique': True
+                    }]
+            }
         })
 
         new_cls = super_new(cls, name, bases, attrs)
@@ -32,11 +40,13 @@ class VersionedDocument(Document):
         #generate a new revision
         if not hasattr(self, '_id'):
             self._id = ObjectId()
+        if not hasattr(self, '_object_id') or not self._object_id:
+            self._object_id = self._id
         self._parent = self._rev
         self._rev = ObjectId()
         #save it in the versioning collection
         nv = self.to_mongo()
-        nv['_id'] = {'id': self._id, 'rev': self._rev}
+        nv['_object_id'] = self._id
         db['versioned_'+self._meta['collection']].insert(nv, safe=True)
 
         return super(VersionedDocument, self).save(*args, **kwargs)

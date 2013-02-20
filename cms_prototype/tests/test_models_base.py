@@ -19,5 +19,5 @@ class VersionedDocument(unittest.TestCase):
 		self.assertEqual(q.count(), 1)
 		q = self.db.versioned_versioned_document.find()
 		self.assertEqual(q.count(), 1)
-		q = self.db.versioned_versioned_document.find({'_id.id': vid})
+		q = self.db.versioned_versioned_document.find({'_object_id': vid})
 		self.assertEqual(q.count(), 1)
