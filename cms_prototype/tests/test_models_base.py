@@ -46,20 +46,36 @@ class VersionedDocumentTestCase(TestCase):
 
     def test_double_revision(self):
     	test_doc = SomeTestDocument(some_key='test value')
+        print test_doc.id
         test_doc.save()
+        print test_doc.id
         test_doc.some_key = 'some other value'
         test_doc.save()
+        print test_doc.id
 
         self.assertEqual(self.db.some_test_document.find().count(), 1)
         self.assertEqual(self.db.some_test_document.find({'_id': test_doc.id}).count(), 1)
         self.assertEqual(self.db.versioned_some_test_document.find().count(), 2)
         self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc.id}).count(), 2)
 
-    def test_compound_key_revision(self):
-    	from cms_prototype.models.site import Site, Url, UrlKey
+    def test_two_documents(self):
+        test_doc_1 = SomeTestDocument(some_key='foo')
+        test_doc_2 = SomeTestDocument(some_key='bar')
 
-    	site = Site(name='@UK', unique_name='uk-plc')
-    	site.save()
+        test_doc_1.save()
+        test_doc_2.save()
+        self.assertEqual(self.db.some_test_document.find().count(), 2)
+        self.assertEqual(self.db.some_test_document.find({'_id': test_doc_1.id}).count(), 1)
+        self.assertEqual(self.db.some_test_document.find({'_id': test_doc_2.id}).count(), 1)
+        self.assertEqual(self.db.versioned_some_test_document.find().count(), 2)
+        self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_1.id}).count(), 1)
+        self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_2.id}).count(), 1)
 
-    	url = Url(key=UrlKey(url='/index.html', site=site))
-    	url.save()
+        test_doc_1.save()
+        test_doc_2.save()
+        self.assertEqual(self.db.some_test_document.find().count(), 2)
+        self.assertEqual(self.db.some_test_document.find({'_id': test_doc_1.id}).count(), 1)
+        self.assertEqual(self.db.some_test_document.find({'_id': test_doc_2.id}).count(), 1)
+        self.assertEqual(self.db.versioned_some_test_document.find().count(), 4)
+        self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_1.id}).count(), 2)
+        self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_2.id}).count(), 2)
