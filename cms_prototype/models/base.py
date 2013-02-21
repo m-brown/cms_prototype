@@ -31,8 +31,8 @@ class VersionedDocument(Document):
         else:
             self._parent = self._rev
 
-        self._rev = ObjectId()
         self._ts = datetime.now()
+        self._rev = ObjectId()
 
         #save it in the versioning collection
         nv = self.to_mongo()
