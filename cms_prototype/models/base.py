@@ -10,7 +10,7 @@ from mongoengine.base import TopLevelDocumentMetaclass
 class VersionedDocument(Document):
     my_metaclass = TopLevelDocumentMetaclass
 
-    _rev    = ObjectIdField(required=True, default=ObjectId)
+    _rev    = ObjectIdField(required=True)
     _parent = ObjectIdField()
     _ts     = DateTimeField(default=datetime.now)
     _meta   = {'abstract': True}
@@ -21,13 +21,12 @@ class VersionedDocument(Document):
         #generate a new revision
         if not self.id:
             self.id = ObjectId()
-            self._parent  = None
-
             # self._created is an internal attribute used by MongoEngine to determine
             # what to do when saving the document. When we assign a value to self.id
             # this attribute gets set to False. We want to reset it to True so ME will
             # do its usual business when saving this new document.
             self._created = True
+            self._parent = None
         else:
             self._parent = self._rev
 
@@ -42,6 +41,24 @@ class VersionedDocument(Document):
         db['versioned_'+self._meta['collection']].insert(nv, safe=True)
 
         return super(VersionedDocument, self).save(*args, **kwargs)
+
+# FIXME: There must be a nicer way around this than doing this?
+# Due to our hackery extending the base document our class we don't end up with a
+# _fields attribute on the class or the _db_field_map or _reverse_db_field_map. To
+# get around this we add these in manually now. The field names also are not being
+# set so we need to do that as well.
+_vd = VersionedDocument
+_vd._fields = {
+    '_rev':    VersionedDocument._rev,
+    '_parent': VersionedDocument._parent,
+    '_ts':     VersionedDocument._ts
+}
+_vd._rev.name    = _vd._rev.db_field    = '_rev'
+_vd._parent.name = _vd._parent.db_field = '_parent'
+_vd._ts.name     = _vd._ts.db_field     = '_ts'
+_vd._db_field_map = {'_parent': '_parent', '_rev': '_rev', '_ts': '_ts'}
+_vd._reverse_db_field_map = _vd._db_field_map
+del _vd
 
 class PublishableDocument(VersionedDocument):
 
