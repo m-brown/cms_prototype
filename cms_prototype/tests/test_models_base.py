@@ -46,12 +46,9 @@ class VersionedDocumentTestCase(TestCase):
 
     def test_double_revision(self):
     	test_doc = SomeTestDocument(some_key='test value')
-        print test_doc.id
         test_doc.save()
-        print test_doc.id
         test_doc.some_key = 'some other value'
         test_doc.save()
-        print test_doc.id
 
         self.assertEqual(self.db.some_test_document.find().count(), 1)
         self.assertEqual(self.db.some_test_document.find({'_id': test_doc.id}).count(), 1)
