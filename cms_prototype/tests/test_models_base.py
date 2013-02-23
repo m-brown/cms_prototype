@@ -8,6 +8,9 @@ from cms_prototype.tests.common import TestCase
 class SomeTestDocument(VersionedDocument):
     some_key = StringField(max_length=50)
 
+class SomeTestInherited(SomeTestDocument):
+    some_other_key = StringField()
+
 class VersionedDocumentTestCase(TestCase):
     def setUp(self):
         super(VersionedDocumentTestCase, self).setUp()
@@ -76,3 +79,14 @@ class VersionedDocumentTestCase(TestCase):
         self.assertEqual(self.db.versioned_some_test_document.find().count(), 4)
         self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_1.id}).count(), 2)
         self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc_2.id}).count(), 2)
+
+    def test_inherited_document(self):
+        test_doc = SomeTestDocument(some_key='foo')
+        test_doc.save()
+        inherted_doc = SomeTestInherited(some_key='foo', some_other_key='bar')
+        inherted_doc.save()
+
+        self.assertEqual(inherted_doc.some_key, 'foo')
+        self.assertEqual(inherted_doc.some_other_key, 'bar')
+
+        self.assertEqual(self.db.some_test_document.find().count(), 2)
