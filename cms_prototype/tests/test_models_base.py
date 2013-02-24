@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from mongoengine import StringField
+from mongoengine import StringField, EmbeddedDocument, EmbeddedDocumentField
 from cms_prototype.models.base import VersionedDocument
 from cms_prototype.tests.common import TestCase
 
@@ -10,6 +10,14 @@ class SomeTestDocument(VersionedDocument):
 
 class SomeTestInherited(SomeTestDocument):
     some_other_key = StringField()
+
+class CompoundKey(EmbeddedDocument):
+    a = StringField(required=True)
+    b = StringField(required=True)
+
+class Compound(VersionedDocument):
+    key = EmbeddedDocumentField(CompoundKey, primary_key=True)
+
 
 class VersionedDocumentTestCase(TestCase):
     def setUp(self):
@@ -90,3 +98,15 @@ class VersionedDocumentTestCase(TestCase):
         self.assertEqual(inherted_doc.some_other_key, 'bar')
 
         self.assertEqual(self.db.some_test_document.find().count(), 2)
+
+    def test_compound_key(self):
+        key = CompoundKey(a='foo', b='bar')
+        compound_doc = Compound(key=key)
+        compound_doc.save()
+
+        self.assertEqual(self.db.compound.find().count(), 1)
+        self.assertEqual(self.db.compound.find({'_id.a': 'foo'}).count(), 1)
+        self.assertEqual(compound_doc.id.a, 'foo')
+        self.assertEqual(compound_doc.id.b, 'bar')
+
+

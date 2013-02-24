@@ -35,7 +35,10 @@ class VersionedDocument(Document):
 
         #save it in the versioning collection
         nv = self.to_mongo()
-        nv['_id'] = {'id': self.id, 'rev': self._rev}
+        if issubclass(type(self.id), EmbeddedDocument):
+            nv['_id'] = {'id': self.id.to_mongo(), 'rev': self._rev}
+        else:
+            nv['_id'] = {'id': self.id, 'rev': self._rev}
 
         db = self._get_db()
         db['versioned_'+self._meta['collection']].insert(nv, safe=True)
