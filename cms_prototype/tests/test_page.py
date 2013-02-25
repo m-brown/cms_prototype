@@ -5,6 +5,9 @@ from cms_prototype.models.site import Site, Page, UrlKey, Url
 
 class PageloadTest(TestCase):
     def setUp(self):
+        super(PageloadTest, self).setUp()
+        self.db = Site._get_collection().database
+
         site = Site(name='test', unique_name='test')
         site.save()
         page = Page()
