@@ -15,6 +15,6 @@ class UrlKey(EmbeddedDocument):
     site        = ReferenceField('Site', dbref=False)
     url         = StringField()
 
-class Url(EmbeddedDocument):
+class Url(VersionedDocument):
     key         = EmbeddedDocumentField('UrlKey', primary_key=True)
     page        = ReferenceField(Page)
