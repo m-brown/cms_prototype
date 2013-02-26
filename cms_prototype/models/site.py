@@ -17,4 +17,4 @@ class UrlKey(EmbeddedDocument):
 
 class Url(EmbeddedDocument):
     key         = EmbeddedDocumentField('UrlKey', primary_key=True)
-    page        = ReferenceField(Page, reverse_delete_rule=DENY)
+    page        = ReferenceField(Page)
