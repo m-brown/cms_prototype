@@ -7,6 +7,7 @@ from cms_prototype.tests.common import TestCase
 
 class SomeTestDocument(VersionedDocument):
     some_key = StringField(max_length=50)
+    meta = {'allow_inheritance': True}
 
 class SomeTestInherited(SomeTestDocument):
     some_other_key = StringField()
