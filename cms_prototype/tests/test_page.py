@@ -1,11 +1,14 @@
-import unittest
-from cms_prototype.tests.common import TestCase
+from pyramid import testing
+from pyramid.httpexceptions import HTTPNotFound
 
+from cms_prototype.tests.common import TestCase
 from cms_prototype.models.site import Site, Page, UrlKey, Url
 
 class PageloadTest(TestCase):
+
     def setUp(self):
         super(PageloadTest, self).setUp()
+        self.config = testing.setUp()
         self.db = Site._get_collection().database
 
         site = Site(name='test', unique_name='test')
@@ -18,16 +21,28 @@ class PageloadTest(TestCase):
 
         from cms_prototype import main
         app = main()
+
         from webtest import TestApp
         self.testapp = TestApp(app)
 
     def test_missing_project(self):
-        res = self.testapp.get('/somerandomprojectthatdoesnotexist/', status=404)
-        self.assertTrue('Not Found' in res.body)
+        from cms_prototype.views.page import page
+
+        request = testing.DummyRequest(matchdict={'unique_name': 'somerandomprojectthatdoesnotexist'})
+
+        with self.assertRaises(HTTPNotFound):
+            page(request)
 
     def test_missing_page(self):
-        res = self.testapp.get('/test/somerandompagethatdoesnotexist.html', status=404)
-        self.assertTrue('Not Found' in res.body)
+        from cms_prototype.views.page import page
+        request = testing.DummyRequest(matchdict={'unique_name': 'test', 'url': 'somerandompagethatdoesnotexist.html'})
 
-	def test_page_load(self):
-		res = self.testapp.get('/test/index.html', status=200)
+        with self.assertRaises(HTTPNotFound):
+            page(request)
+
+    def test_page_load(self):
+        from cms_prototype.views.page import page
+        request  = testing.DummyRequest(matchdict={'unique_name': 'test', 'url': 'index.html'})
+        response = page(request)
+
+        self.assertEquals(response.status_code, 200)
