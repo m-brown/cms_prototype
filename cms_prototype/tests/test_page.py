@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from cms_prototype.tests.common import TestCase
 from cms_prototype.models.site import Site, Page, UrlKey, Url
 
+
 class PageloadTest(TestCase):
 
     def setUp(self):
@@ -42,7 +43,7 @@ class PageloadTest(TestCase):
 
     def test_page_load(self):
         from cms_prototype.views.page import page
-        request  = testing.DummyRequest(matchdict={'unique_name': 'test', 'url': 'index.html'})
+        request = testing.DummyRequest(matchdict={'unique_name': 'test', 'url': 'index.html'})
         response = page(request)
 
         self.assertEquals(response.status_code, 200)

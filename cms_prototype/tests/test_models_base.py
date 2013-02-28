@@ -1,20 +1,21 @@
-import os
-import unittest
-
 from mongoengine import StringField, EmbeddedDocument, EmbeddedDocumentField
 from cms_prototype.models.base import VersionedDocument
 from cms_prototype.tests.common import TestCase
+
 
 class SomeTestDocument(VersionedDocument):
     some_key = StringField(max_length=50)
     meta = {'allow_inheritance': True}
 
+
 class SomeTestInherited(SomeTestDocument):
     some_other_key = StringField()
+
 
 class CompoundKey(EmbeddedDocument):
     a = StringField(required=True)
     b = StringField(required=True)
+
 
 class Compound(VersionedDocument):
     key = EmbeddedDocumentField(CompoundKey, primary_key=True)
@@ -57,7 +58,7 @@ class VersionedDocumentTestCase(TestCase):
         self.assertEqual(self.db.versioned_some_test_document.find({'_id.id': test_doc.id}).count(), 1)
 
     def test_double_revision(self):
-    	test_doc = SomeTestDocument(some_key='test value')
+        test_doc = SomeTestDocument(some_key='test value')
         test_doc.save()
         test_doc.some_key = 'some other value'
         test_doc.save()
@@ -109,5 +110,3 @@ class VersionedDocumentTestCase(TestCase):
         self.assertEqual(self.db.compound.find({'_id.a': 'foo'}).count(), 1)
         self.assertEqual(compound_doc.id.a, 'foo')
         self.assertEqual(compound_doc.id.b, 'bar')
-
-

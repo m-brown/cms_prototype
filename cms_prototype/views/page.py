@@ -1,8 +1,9 @@
-from cms_prototype.models.site import Site, Url, UrlKey
+from cms_prototype.models.site import Site, Url
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from pyramid.view import view_config
+
 
 @view_config(route_name='page')
 def page(request):
