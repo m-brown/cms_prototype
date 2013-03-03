@@ -1,14 +1,16 @@
-from mongoengine import StringField, EmbeddedDocument, EmbeddedDocumentField
+from mongoengine import EmbeddedDocumentField
 from cms_prototype.models.base import VersionedDocument
 from cms_prototype.tests.common import TestCase
 from cms_prototype.models.site import Layout, Block
 
+
 class LayoutDoc(VersionedDocument):
     layout = EmbeddedDocumentField(Layout, dbref=True)
 
+
 class Layout(TestCase):
     def setUp(self):
-        super(VersionedDocumentTestCase, self).setUp()
+        super(Layout, self).setUp()
         self.db = SomeTestDocument._get_collection().database
         self.db.layout_doc.remove()
         self.db.versioned_layout_doc.remove()
