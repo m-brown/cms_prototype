@@ -11,7 +11,7 @@ class LayoutDoc(VersionedDocument):
 class Layout(TestCase):
     def setUp(self):
         super(Layout, self).setUp()
-        self.db = SomeTestDocument._get_collection().database
+        self.db = LayoutDoc._get_collection().database
         self.db.layout_doc.remove()
         self.db.versioned_layout_doc.remove()
         self.db.block.remove()
