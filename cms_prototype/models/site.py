@@ -5,7 +5,7 @@ from cms_prototype.models.base import VersionedDocument
 
 class Block(VersionedDocument):
     name        = StringField()
-
+    _meta       = {'abstract': True}
 
 class Page(VersionedDocument):
     handler     = StringField()

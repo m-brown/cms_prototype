@@ -9,3 +9,9 @@ class MongoTableTest(TestCase):
 
         self.db.block.remove()
         self.db.versioned_block.remove()
+
+    def test_creation(self):
+        t = MongoTable(database=self.db, collection='block')
+        t.populate()
+
+        self.assertNotEqual(t.cursor, None)
