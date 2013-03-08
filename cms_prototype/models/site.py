@@ -1,11 +1,11 @@
-from mongoengine import EmbeddedDocumentField, ReferenceField, StringField, DictField
+from mongoengine import EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField
 from mongoengine import EmbeddedDocument
-from cms_prototype.models.base import VersionedDocument
+from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
 
 
 class Block(VersionedDocument):
     name        = StringField()
-    _meta       = {'abstract': True}
+    meta        = {'allow_inheritance': True}
 
 class Page(VersionedDocument):
     handler     = StringField()
@@ -32,8 +32,8 @@ class Url(VersionedDocument):
 class Layout(EmbeddedDocument):
     html_id     = StringField()
     html_class  = StringField()
-    _layouts    = DictField()
-    _blocks     = DictField()
+    items       = ListField(SwitchableTypeField((EmbeddedDocumentField('Layout'),
+                                                 ReferenceField(Block, dbref=False))))
 
     def add(self, obj):
         nextPos = len(_layouts) + len(_blocks)

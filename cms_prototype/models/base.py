@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 
 from mongoengine import *
 from mongoengine.base import TopLevelDocumentMetaclass
-from mongoengine.base import BaseField
+from mongoengine.base import ComplexBaseField
 
 class VersionedDocument(Document):
     my_metaclass = TopLevelDocumentMetaclass
@@ -69,7 +69,7 @@ class PublishableDocument(VersionedDocument):
     def publish(self, rev):
         raise NotImplementedError
 
-class SwitchableTypeField(ListField):
+class SwitchableTypeField(ComplexBaseField):
 
     def __init__(self, fields, **kwargs):
         self.fields = fields
@@ -83,9 +83,6 @@ class SwitchableTypeField(ListField):
                 pass
 
         return value
-
-    def to_mongo(self, value):
-        pass
 
     def validate(self, value):
         """
