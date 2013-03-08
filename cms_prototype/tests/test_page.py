@@ -23,9 +23,6 @@ class PageloadTest(TestCase):
         from cms_prototype import main
         app = main()
 
-        from webtest import TestApp
-        self.testapp = TestApp(app)
-
     def test_missing_project(self):
         from cms_prototype.views.page import page
 

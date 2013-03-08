@@ -14,5 +14,5 @@ class MongoTable(Block):
     query = StringField()
     sort = StringField()
 
-    def populdate(self):
+    def populate(self):
         cursor = MongoTable._get_collection().database[self.collection].find(spec=query, sort=sort)

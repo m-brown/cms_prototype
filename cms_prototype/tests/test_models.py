@@ -5,12 +5,13 @@ from cms_prototype.models.site import Layout, Block
 
 
 class LayoutDoc(VersionedDocument):
-    layout = EmbeddedDocumentField(Layout, dbref=True)
+    layout = EmbeddedDocumentField(Layout)
 
+class LayoutTestCase(TestCase):
 
-class Layout(TestCase):
     def setUp(self):
-        super(Layout, self).setUp()
+        super(LayoutTestCase, self).setUp()
+
         self.db = LayoutDoc._get_collection().database
         self.db.layout_doc.remove()
         self.db.versioned_layout_doc.remove()
@@ -32,20 +33,22 @@ class Layout(TestCase):
 
     def test_add_block(self):
         ld = LayoutDoc()
+        ld.layout = Layout()
+
         b = Block(name='test')
         b.save()
 
-        ld.add(b)
+        ld.layout.items.append(b)
         ld.save()
 
-        self.assertEqual(len(ld._blocks), 1)
+        layout = self.db.layout_doc.find_one()
+        self.assertEqual(len(layout['layout']['items']), 1)
+        self.assertEqual(layout['layout']['items'][0]['_cls'], 'Block')
         self.assertEqual(self.db.layout_doc.find().count(), 1)
 
     def test_add_layout(self):
         ld = LayoutDoc()
-        l = Layout()
-
-        ld.add(l)
+        ld.layout.layout.append(Layout())
         ld.save()
 
         self.assertEqual(len(ld._layouts), 1)

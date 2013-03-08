@@ -1,4 +1,4 @@
-from mongoengine import StringField, EmbeddedDocument, EmbeddedDocumentField
+from mongoengine import StringField, IntField, EmbeddedDocument, EmbeddedDocumentField
 from cms_prototype.models.base import VersionedDocument
 from cms_prototype.tests.common import TestCase
 from cms_prototype.models.site import Layout, Block
@@ -111,3 +111,19 @@ class VersionedDocumentTestCase(TestCase):
         self.assertEqual(self.db.compound.find({'_id.a': 'foo'}).count(), 1)
         self.assertEqual(compound_doc.id.a, 'foo')
         self.assertEqual(compound_doc.id.b, 'bar')
+
+class SwitchableTypeFieldTestCase(TestCase):
+
+    def test_basic_operation(self):
+        from cms_prototype.models.base import SwitchableTypeField
+
+        field = SwitchableTypeField((StringField(), IntField()))
+
+        self.assertEqual('test', field.to_python('test'))
+        self.assertEqual(0, field.to_python(0))
+
+        field.validate(0)
+        field.validate('test')
+
+        with self.assertRaises(Exception):
+            field.validate({})

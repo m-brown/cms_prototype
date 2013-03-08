@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 
 from mongoengine import *
 from mongoengine.base import TopLevelDocumentMetaclass
+from mongoengine.base import ComplexBaseField
 
 class VersionedDocument(Document):
     my_metaclass = TopLevelDocumentMetaclass
@@ -67,3 +68,35 @@ class PublishableDocument(VersionedDocument):
 
     def publish(self, rev):
         raise NotImplementedError
+
+class SwitchableTypeField(ComplexBaseField):
+
+    def __init__(self, fields, **kwargs):
+        self.fields = fields
+        super(SwitchableTypeField, self).__init__(**kwargs)
+
+    def to_python(self, value):
+        for field in self.fields:
+            try:
+                return field.to_python(value)
+            except:
+                pass
+
+        return value
+
+    def validate(self, value):
+        """
+        Check the values
+        """
+        good_val = False
+        for field in self.fields:
+            try:
+                field.validate(value)
+            except:
+                continue
+
+            good_val = True
+            break
+
+        if not good_val:
+            self.error('Value is not valid for any of the supported fields')
