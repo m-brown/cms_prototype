@@ -15,4 +15,5 @@ class MongoTable(Block):
     sort = StringField()
 
     def populate(self):
-        cursor = MongoTable._get_collection().database[self.collection].find(spec=query, sort=sort)
+        #TODO - restrict select to the columns
+        self.cursor = MongoTable._get_collection().database[self.collection].find(spec=self.query, sort=self.sort)
