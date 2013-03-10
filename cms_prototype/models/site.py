@@ -1,11 +1,27 @@
 from mongoengine import EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField
 from mongoengine import EmbeddedDocument
-from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
 
+from pyramid.renderers import render
+
+from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
 
 class Block(VersionedDocument):
     name        = StringField()
     meta        = {'allow_inheritance': True}
+
+    def render(self, **kwargs):
+        args = {k: v for k, v in self.to_mongo().iteritems() if k[0] != '_'}
+
+        renderer = self._meta.get('renderer')
+        if 'renderer' in kwargs:
+            renderer = kwargs.pop('renderer')
+
+        args.update(kwargs)
+
+        if not renderer:
+            raise Exception('No renderer found')
+
+        return render(renderer, args)
 
 class Page(VersionedDocument):
     handler     = StringField()
