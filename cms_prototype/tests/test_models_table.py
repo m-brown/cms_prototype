@@ -15,3 +15,4 @@ class MongoTableTest(TestCase):
         t.populate()
 
         self.assertNotEqual(t.cursor, None)
+        self.assertEqual(t.cursor.count(), 1)
