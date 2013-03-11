@@ -23,11 +23,6 @@ class Compound(VersionedDocument):
 
 
 class VersionedDocumentTestCase(TestCase):
-    def setUp(self):
-        super(VersionedDocumentTestCase, self).setUp()
-        self.db = SomeTestDocument._get_collection().database
-        self.db.some_test_document.remove()
-        self.db.versioned_some_test_document.remove()
 
     def test_base_fields(self):
         test_doc = SomeTestDocument(some_key='test')
