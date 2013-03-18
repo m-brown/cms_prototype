@@ -13,4 +13,5 @@ def block(request):
     if not b:
         raise HTTPNotFound()
     else:
-        return Response(b)
+        print b.render
+        return Response(b.render())

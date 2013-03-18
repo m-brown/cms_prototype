@@ -14,6 +14,8 @@ class MongoTable(Block):
     query = StringField()
     sort = StringField()
 
+    meta = {'renderer': '/blocks/table.mako'}
+
     def populate(self):
         #TODO - restrict select to the columns
         self.cursor = MongoTable._get_collection().database[self.collection].find(spec=self.query, sort=self.sort)
