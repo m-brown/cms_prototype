@@ -1,21 +1,17 @@
 from pyramid import testing
 from pyramid.httpexceptions import HTTPNotFound
 
-from cms_prototype.tests.common import TestCase
+from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.site import Block
 from cms_prototype.models.table import MongoTable, MongoColumn
+from cms_prototype.models.text import HTMLBlock
 from bson.objectid import ObjectId
 
 
-class BlockViewTest(TestCase):
+class BlockViewTest(TemplateTestCase):
 
     def setUp(self):
         super(BlockViewTest, self).setUp()
-        self.config = testing.setUp()
-        self.db = Block._get_collection().database
-
-        self.db.block.remove()
-        self.db.versioned_block.remove()
 
         b = Block(name='test')
         b.save()
@@ -49,3 +45,15 @@ class BlockViewTest(TestCase):
         self.assertEquals(response.status_code, 200)
 
         print response
+
+    def test_text_block(self):
+        from cms_prototype.views.block import block
+
+        html = HTMLBlock(text='Fun test time')
+        html.save()
+
+        request = testing.DummyRequest(matchdict={'block': html.id})
+        response = block(request)
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.body.strip(), 'Fun test time')

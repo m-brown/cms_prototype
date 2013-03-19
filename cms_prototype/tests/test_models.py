@@ -10,15 +10,6 @@ class LayoutDoc(VersionedDocument):
 
 class LayoutTestCase(TestCase):
 
-    def setUp(self):
-        super(LayoutTestCase, self).setUp()
-
-        self.db = LayoutDoc._get_collection().database
-        self.db.layout_doc.remove()
-        self.db.versioned_layout_doc.remove()
-        self.db.block.remove()
-        self.db.versioned_block.remove()
-
     def test_empty_layout(self):
         ld = LayoutDoc()
         ld.save()

@@ -1,8 +1,8 @@
-from cms_prototype.tests.common import TestCase
+from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.table import MongoTable
 
 
-class MongoTableTest(TestCase):
+class MongoTableTest(TemplateTestCase):
     def setUp(self):
         super(MongoTableTest, self).setUp()
         self.db = MongoTable._get_collection().database
