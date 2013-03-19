@@ -11,8 +11,8 @@ class MongoTable(Block):
     database = StringField(required=True)
     collection = StringField(required=True)
     columns = ListField(MongoColumn)
-    query = StringField()
-    sort = StringField()
+    spec = DictField()
+    sort = DictField()
 
     meta = {'renderer': '/blocks/table.mako'}
 
@@ -24,8 +24,12 @@ class MongoTable(Block):
         return super(MongoTable, self).render(**args)
 
     def populate(self):
+        sort = []
+        for key, value in self.sort.iteritems():
+            sort.append((key, value))
+
         #TODO - restrict select to the columns
-        cursor = MongoTable._get_collection().database[self.collection].find(spec=self.query, sort=self.sort)
+        cursor = MongoTable._get_collection().database[self.collection].find(self.spec, sort=sort)
         self.data = []
         for row in cursor:
             self.data.append(row)
