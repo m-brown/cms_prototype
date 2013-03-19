@@ -22,7 +22,7 @@ class FormBlock(Block):
 
     type   = IntField(default=1)
     action = StringField(default='', required=False)
-    method = StringField(default='POST')
+    method = StringField(default='POST', regex=r'(GET|POST)')
     fields = ListField(EmbeddedDocumentField(Input))
 
     meta = {'renderer': '/blocks/form.jade'}
