@@ -1,5 +1,5 @@
 <table>
-	% for row in rows:
+	% for row in data:
 		<tr>
 			<td>${row}</td>
 		</tr>

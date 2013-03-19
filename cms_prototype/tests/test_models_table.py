@@ -15,13 +15,18 @@ class MongoTableTest(TemplateTestCase):
         t.save()
         t.populate()
 
-        self.assertNotEqual(t.cursor, None)
-        self.assertEqual(t.cursor.count(), 1)
+        self.assertNotEqual(t.data, None)
+        self.assertEqual(len(t.data), 1)
 
     def test_render(self):
         t = MongoTable(database=self.db.name, collection='block')
         t.save()
 
         a = MongoTable.objects(id=t.id).first()
+        a.populate()
 
-        self.assertNotEqual(a.render(), '')
+        html = a.render()
+
+        self.assertNotEqual(html, '')
+        self.assertIn('<table>', html)
+        self.assertEqual(html.count('<tr>'), 1)

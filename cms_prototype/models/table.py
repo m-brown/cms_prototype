@@ -17,10 +17,15 @@ class MongoTable(Block):
     meta = {'renderer': '/blocks/table.mako'}
 
     def render(self, **kwargs):
-        #args = {'rows': .....}
-        #args.update(kwargs)
-        return super(MongoTable, self).render(**kwargs)
+        if not hasattr(self, 'data'):
+            populate(self)
+        args = {'data': self.data}
+        args.update(kwargs)
+        return super(MongoTable, self).render(**args)
 
     def populate(self):
         #TODO - restrict select to the columns
-        self.cursor = MongoTable._get_collection().database[self.collection].find(spec=self.query, sort=self.sort)
+        cursor = MongoTable._get_collection().database[self.collection].find(spec=self.query, sort=self.sort)
+        self.data = []
+        for row in cursor:
+            self.data.append(row)
