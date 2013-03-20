@@ -80,6 +80,7 @@ class MongoTableTest(TemplateTestCase):
 
     def test_sort(self):
         t = MongoTable(database=self.db.name, collection='block', name='table', sort={'name': 1})
+        t.columns.append(MongoColumn(field='name', display='Name'))
         t.save()
 
         b2 = Block(name='test2')

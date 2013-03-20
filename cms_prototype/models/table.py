@@ -40,5 +40,4 @@ class MongoTable(Block):
                 if not col.field in row:
                     raise AttributeError('The row has not attribute "' + col.field + '"')
                 r[col.field] = row[col.field]
-            print r
             self.data.append(r)

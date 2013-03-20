@@ -13,10 +13,6 @@ class BlockViewTest(TemplateTestCase):
     def setUp(self):
         super(BlockViewTest, self).setUp()
 
-        b = Block(name='test')
-        b.save()
-        self.block_id = b.id
-
     def test_missing_block(self):
         from cms_prototype.views.block import block
 
@@ -28,7 +24,10 @@ class BlockViewTest(TemplateTestCase):
     def test_independant_block(self):
         from cms_prototype.views.block import block
 
-        request = testing.DummyRequest(matchdict={'block': self.block_id})
+        b = Block(name='test')
+        b.save()
+
+        request = testing.DummyRequest(matchdict={'block': b.id})
         response = block(request)
 
         self.assertEquals(response.status_code, 200)
@@ -36,7 +35,8 @@ class BlockViewTest(TemplateTestCase):
     def test_table_block(self):
         from cms_prototype.views.block import block
 
-        t = MongoTable(database=self.db.name, collection='block', columns=[MongoColumn(field='name')])
+        t = MongoTable(database=self.db.name, collection='block', name='test table')
+        t.columns.append(MongoColumn(field='name'))
         t.save()
 
         request = testing.DummyRequest(matchdict={'block': t.id})
