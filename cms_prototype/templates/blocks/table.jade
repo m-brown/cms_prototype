@@ -1,0 +1,9 @@
+table.table.table-hover
+	thead
+		each col in columns
+			th #{col['display']}
+	tbody
+		each row in data
+			tr
+				each col in columns
+					td #{row[col]}

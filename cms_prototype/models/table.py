@@ -14,7 +14,7 @@ class MongoTable(Block):
     spec = DictField()
     sort = DictField()
 
-    meta = {'renderer': '/blocks/table.mako'}
+    meta = {'renderer': '/blocks/table.jade'}
 
     def render(self, **kwargs):
         if not hasattr(self, 'data'):

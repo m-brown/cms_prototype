@@ -50,8 +50,9 @@ class MongoTableTest(TemplateTestCase):
 
         html = a.render()
 
+        print html
         self.assertNotEqual(html, '')
-        self.assertIn('<table>', html)
+        self.assertIn('<table', html)
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_sort(self):
