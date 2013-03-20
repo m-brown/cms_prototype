@@ -1,4 +1,4 @@
-from mongoengine import EmbeddedDocument, ReferenceField, StringField, DictField, ListField
+from mongoengine import EmbeddedDocument, EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField
 from cms_prototype.models.site import Block
 
 
@@ -10,7 +10,7 @@ class MongoColumn(EmbeddedDocument):
 class MongoTable(Block):
     database = StringField(required=True)
     collection = StringField(required=True)
-    columns = ListField(MongoColumn)
+    columns = ListField(EmbeddedDocumentField(MongoColumn))
     spec = DictField()
     sort = DictField()
 
@@ -18,7 +18,7 @@ class MongoTable(Block):
 
     def render(self, **kwargs):
         if not hasattr(self, 'data'):
-            populate(self)
+            self.populate()
         args = {'data': self.data}
         args.update(kwargs)
         return super(MongoTable, self).render(**args)
@@ -28,8 +28,17 @@ class MongoTable(Block):
         for key, value in self.sort.iteritems():
             sort.append((key, value))
 
-        #TODO - restrict select to the columns
-        cursor = MongoTable._get_collection().database[self.collection].find(self.spec, sort=sort)
+        fields = {}
+        for col in self.columns:
+            fields[col.field] = 1
+
+        cursor = MongoTable._get_collection().database[self.collection].find(self.spec, fields=fields, sort=sort)
         self.data = []
         for row in cursor:
-            self.data.append(row)
+            r = {}
+            for col in self.columns:
+                if not col.field in row:
+                    raise AttributeError('The row has not attribute "' + col.field + '"')
+                r[col.field] = row[col.field]
+            print r
+            self.data.append(r)

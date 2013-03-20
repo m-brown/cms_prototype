@@ -1,5 +1,5 @@
 from cms_prototype.tests.common import TemplateTestCase
-from cms_prototype.models.table import MongoTable
+from cms_prototype.models.table import MongoTable, MongoColumn
 from cms_prototype.models.site import Block
 
 
@@ -53,6 +53,29 @@ class MongoTableTest(TemplateTestCase):
         print html
         self.assertNotEqual(html, '')
         self.assertIn('<table', html)
+        self.assertEqual(html.count('<tr>'), 1)
+
+    def test_render_columns(self):
+        t = MongoTable(database=self.db.name, collection='block', name='test table')
+        t.columns.append(MongoColumn(field='name', display='Name'))
+        t.columns.append(MongoColumn(field='_cls', display='Class'))
+        t.save()
+
+        t.populate()
+        html = t.render()
+        print html
+
+        self.assertIn('<table', html)
+        self.assertEqual(html.count('<tr>'), 1)
+        self.assertEqual(html.count('<th>'), 2)
+        self.assertEqual(html.count('<td>'), 2)
+
+    def test_render_nopopulate(self):
+        t = MongoTable(database=self.db.name, collection='block')
+        t.save()
+
+        html = t.render()
+        self.assertNotEqual(html, '')
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_sort(self):
