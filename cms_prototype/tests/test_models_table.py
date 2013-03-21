@@ -50,7 +50,6 @@ class MongoTableTest(TemplateTestCase):
 
         html = a.render()
 
-        print html
         self.assertNotEqual(html, '')
         self.assertIn('<table', html)
         self.assertEqual(html.count('<tr>'), 1)
@@ -63,7 +62,6 @@ class MongoTableTest(TemplateTestCase):
 
         t.populate()
         html = t.render()
-        print html
 
         self.assertIn('<table', html)
         self.assertEqual(html.count('<tr>'), 1)

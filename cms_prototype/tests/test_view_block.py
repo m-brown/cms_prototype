@@ -48,8 +48,6 @@ class BlockViewTest(TemplateTestCase):
 
         self.assertEquals(response.status_code, 200)
 
-        print response
-
     def test_text_block(self):
         from cms_prototype.views.block import block
 
