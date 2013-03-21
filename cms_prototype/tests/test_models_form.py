@@ -7,8 +7,7 @@ from cms_prototype.tests.common import TemplateTestCase
 
 FORM_HTML = """
 <form action="" method="POST">
-  <label for="name">Name
-  </label>
+  <label for="name">Name</label>
   <input type="text" id="name" name="name"/>
 </form>
 """.strip()
