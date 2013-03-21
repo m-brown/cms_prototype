@@ -1,3 +1,5 @@
+import markdown
+
 from mongoengine import StringField
 from cms_prototype.models.site import Block
 
@@ -5,8 +7,12 @@ class HTMLBlock(Block):
 
     text = StringField()
 
-    meta = {'renderer': '/blocks/html.mako'}
+    meta = {'renderer': '/blocks/html.jade'}
 
 class MarkdownBlock(HTMLBlock):
 
-    meta = {'renderer': '/blocks/markdown.jade'}
+    def render(self, **kwargs):
+        args = {'text': markdown.markdown(self.text)}
+        args.update(kwargs)
+        return super(MarkdownBlock, self).render(**args)
+
