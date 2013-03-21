@@ -1,7 +1,7 @@
 table.table.table-hover
 	thead
 		each col in columns
-			th #{col['display']}
+			th #{col.get('display', '')}
 	tbody
 		each row in data
 			tr

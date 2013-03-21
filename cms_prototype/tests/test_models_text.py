@@ -1,3 +1,4 @@
+from nose.plugins.skip import SkipTest
 from cms_prototype.tests.common import TemplateTestCase
 
 class TextModelsTestCase(TemplateTestCase):
@@ -17,7 +18,7 @@ class TextModelsTestCase(TemplateTestCase):
     def test_markdown_block(self):
         from cms_prototype.models.text import MarkdownBlock
 
-        html = '<strong>Testing</strong>'
+        html = '<p><strong>Testing</strong></p>'
         markdown = '**Testing**'
 
         block = MarkdownBlock(text=markdown)
