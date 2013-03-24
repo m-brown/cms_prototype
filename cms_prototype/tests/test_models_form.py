@@ -24,7 +24,7 @@ CBOX_HTML = """
 class FormModelsTestCase(TemplateTestCase):
 
     def test_simple_form(self):
-        from cms_prototype.models.form import FormBlock, Input
+        from cms_prototype.models.blocks.form import FormBlock, Input
 
         form_a = FormBlock()
 
@@ -39,7 +39,7 @@ class FormModelsTestCase(TemplateTestCase):
         self.assertEqual(form_a.render().strip(), FORM_HTML)
 
     def test_checkbox_form(self):
-        from cms_prototype.models.form import FormBlock, Checkbox
+        from cms_prototype.models.blocks.form import FormBlock, Checkbox
 
         form_a = FormBlock()
 

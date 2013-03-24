@@ -1,7 +1,8 @@
 from mongoengine import EmbeddedDocumentField
 from cms_prototype.models.base import VersionedDocument
 from cms_prototype.tests.common import TestCase
-from cms_prototype.models.site import Layout, Block
+from cms_prototype.models.site import Layout
+from cms_prototype.models.blocks.block import Block
 
 
 class LayoutDoc(VersionedDocument):

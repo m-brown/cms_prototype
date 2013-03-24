@@ -1,0 +1,203 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"to",
+				"to_mongo"
+			],
+			[
+				"com",
+				"compound_doc"
+			],
+			[
+				"co",
+				"compound_doc"
+			],
+			[
+				"Co",
+				"CompoundKey"
+			],
+			[
+				"som",
+				"some_other_key"
+			],
+			[
+				"some",
+				"some_key"
+			],
+			[
+				"Some",
+				"SomeTestInherited"
+			],
+			[
+				"tes",
+				"test_doc"
+			],
+			[
+				"Som",
+				"SomeTestDocument"
+			],
+			[
+				"a",
+				"assertEqual"
+			],
+			[
+				"uni",
+				"unqiue_name"
+			],
+			[
+				"re",
+				"retrieved_site"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 147.0,
+		"selected_items":
+		[
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"install package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/models/site.py",
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/models/base.py",
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/application.py",
+		"/Users/matthewbrown/Documents/noscito/site/public/javascripts/tableupdate.coffee",
+		"/Users/matthewbrown/Documents/test.coffee",
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/tests.py",
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/models/__init__.py",
+		"/Users/matthewbrown/Documents/pyramid_workspace/group/site/lib/revisioning.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"	",
+			"prim"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"    "
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

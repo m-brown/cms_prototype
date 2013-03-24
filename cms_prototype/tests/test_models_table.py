@@ -1,6 +1,6 @@
 from cms_prototype.tests.common import TemplateTestCase
-from cms_prototype.models.table import MongoTable, MongoColumn
-from cms_prototype.models.site import Block
+from cms_prototype.models.blocks.table import MongoTable, MongoColumn
+from cms_prototype.models.blocks.block import Block
 
 
 class MongoTableTest(TemplateTestCase):

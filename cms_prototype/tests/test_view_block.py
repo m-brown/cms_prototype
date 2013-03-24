@@ -4,9 +4,9 @@ from pyramid import testing
 from pyramid.httpexceptions import HTTPNotFound
 
 from cms_prototype.tests.common import TemplateTestCase
-from cms_prototype.models.site import Block
-from cms_prototype.models.table import MongoTable, MongoColumn
-from cms_prototype.models.text import HTMLBlock
+from cms_prototype.models.blocks.block import Block
+from cms_prototype.models.blocks.table import MongoTable, MongoColumn
+from cms_prototype.models.blocks.text import HTMLBlock
 from bson.objectid import ObjectId
 
 

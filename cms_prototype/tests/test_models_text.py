@@ -4,7 +4,7 @@ from cms_prototype.tests.common import TemplateTestCase
 class TextModelsTestCase(TemplateTestCase):
 
     def test_html_block(self):
-        from cms_prototype.models.text import HTMLBlock
+        from cms_prototype.models.blocks.text import HTMLBlock
 
         html = '<p>Testing</p>'
 
@@ -16,7 +16,7 @@ class TextModelsTestCase(TemplateTestCase):
         self.assertEqual(html, block.render().strip())
 
     def test_markdown_block(self):
-        from cms_prototype.models.text import MarkdownBlock
+        from cms_prototype.models.blocks.text import MarkdownBlock
 
         html = '<p><strong>Testing</strong></p>'
         markdown = '**Testing**'
