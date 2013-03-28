@@ -1,6 +1,8 @@
 from mongoengine import StringField
+from pyramid.renderers import render
 
 from cms_prototype.models.base import VersionedDocument
+
 
 class Block(VersionedDocument):
     name        = StringField()
