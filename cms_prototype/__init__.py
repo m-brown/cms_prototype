@@ -1,4 +1,7 @@
 from pyramid.config import Configurator
+from mongoengine import connect
+import os
+
 
 def main(global_config='', **settings):
     """ This function returns a Pyramid WSGI application.
@@ -7,6 +10,8 @@ def main(global_config='', **settings):
         config = Configurator(settings=settings)
     else:
         config = Configurator()
+
+    connect('cms', host=os.getenv('DB_HOST', 'localhost'))
 
     config.include('pyjade.ext.pyramid')
 
