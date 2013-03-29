@@ -16,8 +16,8 @@ def main(global_config='', **settings):
     config.include('pyjade.ext.pyramid')
 
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_route('block', '/{site_unique_name}/_block/{block}')
     config.add_route('page', '/{site_unique_name}/{url}')
-    config.add_route('block', '/_block/{block}')
 
     config.scan('cms_prototype.views.page')
 
