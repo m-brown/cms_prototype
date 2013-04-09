@@ -3,7 +3,6 @@ from cms_prototype.models.page_handler import PageHandler
 from cms_prototype.models.site import Page
 from cms_prototype.models.layout import Layout
 from cms_prototype.models.blocks.text import Text
-from nose.plugins.skip import SkipTest
 
 
 class Handler(TestCase):
