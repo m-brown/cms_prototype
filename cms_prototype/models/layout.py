@@ -14,12 +14,12 @@ class Layout(EmbeddedDocument):
     meta = {'renderer': '/layout.jade'}
 
     def render(self):
-    	renderer = self._meta.get('renderer')
-    	args = {k: v for k, v in self.to_mongo().iteritems() if k[0] != '_'}
+        renderer = self._meta.get('renderer')
+        args = {k: v for k, v in self.to_mongo().iteritems() if k[0] != '_'}
 
-        self.html = []
+        html = []
         for item in self.items:
-            self.html.append(item.render())
+            html.append(item.render())
         args['html'] = html
 
         return render(renderer, args)

@@ -7,7 +7,7 @@ from cms_prototype.models.blocks.text import Text
 
 class Handler(TestCase):
 
-    def test_non-modified_render(self):
+    def test_non_modified_render(self):
         l = Layout()
         l.items.append(Text(text='foo'))
         p = Page(layout=l)
