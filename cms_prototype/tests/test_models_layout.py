@@ -25,18 +25,20 @@ class LayoutTest(TemplateTestCase):
 
         html = l.render()
 
-        self.assertEqual(html, '<div class="layout"><div class="block">foo</div></div>')
+        self.assertEqual(html, '<div class="layout">\n<div class="block">\nfoo\n</div>\n</div>')
 
     def test_single_depth_multi_block(self):
         b = HTMLBlock(text='foo')
         b.save()
         b2 = HTMLBlock(text='bar')
+        b2.save()
         l = Layout()
         l.items.append(b)
+        l.items.append(b2)
 
         html = l.render()
 
-        self.assertEqual(html, '<div class="layout"><div class="block">foo</div><div class="block">bar</div></div>')
+        self.assertEqual(html, '<div class="layout">\n<div class="block">\nfoo\n</div>\n<div class="block">\nbar\n</div>\n</div>')
 
     def test_double_depth_single_blocks(self):
         b = HTMLBlock(text='foo')
@@ -52,4 +54,4 @@ class LayoutTest(TemplateTestCase):
 
         html = l.render()
 
-        self.assertEqual(html, '<div class="layout"><div class="block">foo</div><div class="layout"><div class="block">bar</div></div></div>')
+        self.assertEqual(html, '<div class="layout">\n<div class="block">\nfoo\n</div>\n<div class="layout">\n<div class="block">\nbar\n</div>\n</div>\n</div>')
