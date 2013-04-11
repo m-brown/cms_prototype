@@ -1,8 +1,8 @@
 import os
-
 from pyramid import testing
 from mongoengine import connect
 from unittest import TestCase as _TestCase
+
 
 class TestCase(_TestCase):
 
@@ -11,6 +11,7 @@ class TestCase(_TestCase):
         from cms_prototype.models.base import VersionedDocument
         self.db = VersionedDocument._get_db()
         self.db.connection.drop_database('cms')
+
 
 class TemplateTestCase(TestCase):
 
