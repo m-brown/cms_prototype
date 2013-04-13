@@ -1,4 +1,4 @@
-div(id=html_id, class=('layout' if action == undefined else 'layout ' + action))
+div(id=html_id, class=('layout' if html_class == undefined else 'layout ' + html_class))
     each item in html
         .block
-            item
+            #{item}
