@@ -50,8 +50,14 @@ class TestTemplateTestCase(_TestCase):
 
         self.assertEquals(c, r)
 
+    def test_text(self):
+        t = '<div id="foo">foo         \n</div>'
+        c = '<div id="foo">foo</div>'
+        r = strip_html_whitespace(t)
+
+        self.assertEquals(c, r)
+
 
 def strip_html_whitespace(html):
-    html = re.sub(r'>\s+<', '><', html)
-    html = re.sub(r'^\s+<', '<', html)
-    return re.sub(r'>\s+$', '>', html)
+    html = re.sub(r'>\s+', '>', html)
+    return re.sub(r'\s+<', '<', html)
