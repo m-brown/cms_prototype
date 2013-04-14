@@ -18,6 +18,9 @@ class PageHandler:
     def pre_block_process(self):
         return
 
+    def block_process(self):
+        return
+
     """
         Code to be run after blocks are processed
     """
@@ -25,4 +28,7 @@ class PageHandler:
         return
 
     def render(self):
-        return self.page.layout.render()
+        if self.page.layout:
+            return self.page.layout.render()
+        else:
+            return ''

@@ -9,24 +9,25 @@ from cms_prototype.models.layout import Layout
 
 
 class Page(VersionedDocument):
-    handler     = StringField()
-    parameters  = DictField()
-    body        = StringField()
-    layout      = EmbeddedDocumentField('Layout')
+    handler_module = StringField()
+    handler_class  = StringField()
+    parameters     = DictField()
+    body           = StringField()
+    layout         = EmbeddedDocumentField('Layout')
 
 
 class Site(VersionedDocument):
-    name        = StringField()
-    unique_name = StringField()
-    header      = ReferenceField(Block, dbref=True)
-    footer      = ReferenceField(Block, dbref=True)
+    name           = StringField()
+    unique_name    = StringField()
+    header         = ReferenceField(Block, dbref=True)
+    footer         = ReferenceField(Block, dbref=True)
 
 
 class UrlKey(EmbeddedDocument):
-    site        = ReferenceField('Site', dbref=False)
-    url         = StringField()
+    site           = ReferenceField('Site', dbref=False)
+    url            = StringField()
 
 
 class Url(VersionedDocument):
-    key         = EmbeddedDocumentField('UrlKey', primary_key=True)
-    page        = ReferenceField(Page, dbref=True)
+    key            = EmbeddedDocumentField('UrlKey', primary_key=True)
+    page           = ReferenceField(Page, dbref=True)

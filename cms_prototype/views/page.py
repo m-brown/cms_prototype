@@ -1,13 +1,8 @@
 from cms_prototype.models.site import Site, Url
-
+from cms_prototype.models.page_handler import PageHandler
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from pyramid.view import view_config
-
-def load_handler(handler):
-    # do magic loading
-    if not hasattr('pre_load', module):
-        setattr('pre_load', None)
 
 
 @view_config(route_name='page')
@@ -20,14 +15,14 @@ def page(request):
     if not url:
         raise HTTPNotFound()
 
-    handler = load_handler(url.page.handler) if url.page.handler else None
+    if url.page.handler_module:
+        mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1).PostProcessHandler
+        HandlerClass = getattr(mod, url.page.handler_class)
+        handler = HandlerClass(page=url.page)
+    else:
+        handler = PageHandler(page=url.page)
 
-    if handler:
-        handler.pre_load(request)
-
-    # Do stuff
-
-    if handler:
-        handler.post_load(request, None)
-
-    return Response(url)
+    handler.pre_block_process()
+    handler.block_process()
+    handler.post_block_process()
+    return Response(handler.render())
