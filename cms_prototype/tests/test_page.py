@@ -9,15 +9,6 @@ class PageloadTest(TestCase):
 
     def setUp(self):
         super(PageloadTest, self).setUp()
-        self.config = testing.setUp()
-        self.db = Site._get_collection().database
-
-        self.db.site.remove()
-        self.db.versioned_site.remove()
-        self.db.page.remove()
-        self.db.versioned_page.remove()
-        self.db.url.remove()
-        self.db.versioned_url.remove()
 
         site = Site(name='test', unique_name='test')
         site.save()
