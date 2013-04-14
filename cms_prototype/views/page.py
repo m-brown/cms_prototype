@@ -16,7 +16,7 @@ def page(request):
         raise HTTPNotFound()
 
     if url.page.handler_module:
-        mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1).PostProcessHandler
+        mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1)
         HandlerClass = getattr(mod, url.page.handler_class)
         handler = HandlerClass(page=url.page)
     else:

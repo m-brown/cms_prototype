@@ -16,9 +16,11 @@ class PageHandler:
         Code to run before blocks are processed
     """
     def pre_block_process(self):
+        #assume that the child class will not call super so put no code here
         return
 
     def block_process(self):
+        #assume that the child class will not call super so put no code here
         return
 
     """
