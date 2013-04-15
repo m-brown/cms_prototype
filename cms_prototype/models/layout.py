@@ -19,7 +19,7 @@ class Layout(EmbeddedDocument):
 
         html = []
         for item in self.items:
-            html.append(item.render())
+            html.append({'html': item.render(), 'is_layout': isinstance(item, Layout)})
         args['html'] = html
 
         return render(renderer, args)

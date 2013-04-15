@@ -1,4 +1,7 @@
 div(id=html_id, class=('layout' if html_class == undefined else 'layout ' + html_class))
     each item in html
-        .block
-            #{item}
+        - if (item['is_layout'])
+            ${item['html']|n}
+        -else
+            .block
+                ${item['html']|n}
