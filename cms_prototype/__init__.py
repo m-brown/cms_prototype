@@ -17,6 +17,7 @@ def main(global_config='', **settings):
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_route('block', '/{site_unique_name}/_block/{block}')
+    config.add_route('editor', '/{site_unique_name}/_editor/{url}')
     config.add_route('page', '/{site_unique_name}/{url}')
 
     config.scan('cms_prototype.views.page')

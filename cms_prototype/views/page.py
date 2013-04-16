@@ -6,7 +6,7 @@ from pyramid.view import view_config
 
 
 @view_config(route_name='page')
-def page(request):
+def page(request, editor=False):
     site = Site.objects(unique_name=request.matchdict['unique_name']).first()
     if not site:
         raise HTTPNotFound()
@@ -26,3 +26,15 @@ def page(request):
     handler.block_process()
     handler.post_block_process()
     return Response(handler.render())
+
+
+@view_config(route_name='editor')
+def editor(request):
+    site = Site.objects(unique_name='_editor')
+    url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
+
+    if not url:
+        return page(request, True)
+    else:
+        request.matchdict['unique_name'] = '_editor'
+        return page(request, False)
