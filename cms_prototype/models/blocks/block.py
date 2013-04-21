@@ -6,6 +6,8 @@ from cms_prototype.models.base import VersionedDocument
 
 class Block(VersionedDocument):
     name        = StringField()
+    html_class  = StringField()
+    html_id     = StringField()
     meta        = {'allow_inheritance': True}
 
     def render(self, **kwargs):
