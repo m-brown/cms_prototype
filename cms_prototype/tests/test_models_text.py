@@ -1,6 +1,7 @@
 from nose.plugins.skip import SkipTest
 from cms_prototype.tests.common import TemplateTestCase
 
+
 class TextModelsTestCase(TemplateTestCase):
 
     def test_html_block(self):
