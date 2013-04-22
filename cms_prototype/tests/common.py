@@ -1,8 +1,8 @@
 import os
+import re
 from pyramid import testing
 from mongoengine import connect
 from unittest import TestCase as _TestCase
-import re
 
 
 class TestCase(_TestCase):
@@ -25,6 +25,7 @@ class TemplateTestCase(TestCase):
         mako_mod_directory = os.getenv('MAKO_MOD_DIRECTORY')
         if mako_mod_directory:
             self.config.add_settings({'mako.module_directory': mako_mod_directory})
+
         self.config.include('pyjade.ext.pyramid')
 
 

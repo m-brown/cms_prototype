@@ -1,8 +1,8 @@
-from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 from cms_prototype.models.page_handler import PageHandler
 from cms_prototype.models.site import Page
 from cms_prototype.models.layout import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
+from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 
 
 class PreProcessHandler(PageHandler):
@@ -17,10 +17,10 @@ class PostProcessHandler(PageHandler):
         self.layout.items[0].text = 'bar'
 
 
-class Handler(TemplateTestCase):
+class HandlerTestCase(TemplateTestCase):
 
     def setUp(self):
-        super(TemplateTestCase, self).setUp()
+        super(HandlerTestCase, self).setUp()
         b = HTMLBlock(text='foo')
         b.save()
         l = Layout()
