@@ -3,13 +3,14 @@ from cms_prototype.models.page_handler import PageHandler
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 from pyramid.view import view_config
+from pylons.controllers.util import redirect
 
 
 @view_config(route_name='page')
 def page(request, editor=False):
     site = Site.objects(unique_name=request.matchdict['unique_name']).first()
     if not site:
-        raise HTTPNotFound()
+        redirect(request.matchdict['unique_name']+'/_editor/create')
 
     url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
     if not url:
