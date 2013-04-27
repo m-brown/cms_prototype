@@ -1,3 +1,6 @@
+from pyramid.renderers import render
+
+
 """ Base handler class which controls the code side of each page load.
     Custom pages should inherit from this and override preload and postload.
 
@@ -9,6 +12,8 @@
     5. Render
 """
 class PageHandler:
+    meta = {'renderer': '/page.jade'}
+
     def __init__(self, page):
         self.page = page
 
@@ -30,7 +35,11 @@ class PageHandler:
         return
 
     def render(self):
+        renderer = self.meta.get('renderer')
+        args = {}
+        args['page'] = self.page.to_mongo()
+
         if self.page.layout:
-            return self.page.layout.render()
-        else:
-            return ''
+            args['layout'] = self.page.layout.render()
+
+        return render(renderer, args)
