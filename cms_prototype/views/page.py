@@ -10,7 +10,7 @@ from pylons.controllers.util import redirect
 def page(request, editor=False):
     site = Site.objects(unique_name=request.matchdict['site_unique_name']).first()
     if not site:
-        redirect(request.matchdict['site_unique_name']+'/_editor/create')
+        redirect('/'+request.matchdict['site_unique_name']+'/_editor/notfound.html')
 
     url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
     if not url:
@@ -31,7 +31,7 @@ def page(request, editor=False):
 
 @view_config(route_name='editor')
 def editor(request):
-    site = Site.objects(unique_name='_editor')
+    site = Site.objects(unique_name='_editor').first()
     url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
 
     if not url:
