@@ -4,12 +4,14 @@ from mongoengine import EmbeddedDocument
 from pyramid.renderers import render
 from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
 from cms_prototype.models.blocks.block import Block
+from cms_prototype.models.blocks.text import HTMLBlock
+from cms_prototype.models.blocks.link import Link
 
 
 class Layout(EmbeddedDocument):
     html_id = StringField()
     html_class = StringField()
-    items = ListField(SwitchableTypeField((EmbeddedDocumentField('Layout'), ReferenceField(Block, dbref=False))))
+    items = ListField(SwitchableTypeField((EmbeddedDocumentField('self'), ReferenceField(Block, dbref=False))))
 
     meta = {'renderer': '/layout.jade'}
 
