@@ -8,9 +8,9 @@ from pylons.controllers.util import redirect
 
 @view_config(route_name='page')
 def page(request, editor=False):
-    site = Site.objects(unique_name=request.matchdict['unique_name']).first()
+    site = Site.objects(unique_name=request.matchdict['site_unique_name']).first()
     if not site:
-        redirect(request.matchdict['unique_name']+'/_editor/create')
+        redirect(request.matchdict['site_unique_name']+'/_editor/create')
 
     url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
     if not url:
@@ -37,5 +37,5 @@ def editor(request):
     if not url:
         return page(request, True)
     else:
-        request.matchdict['unique_name'] = '_editor'
+        request.matchdict['site_unique_name'] = '_editor'
         return page(request, False)
