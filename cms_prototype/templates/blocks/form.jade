@@ -5,5 +5,6 @@ form(action="${action}", method="${method}")
                 input(type="${field['type']}", id="${field['name']}", name="${field['name']}")
                 ${field['label']}
         else
-            label(for="${field['name']}") ${field['label']}
+            if (field['label'])
+                label(for="${field['name']}") ${field['label']}
             input(type="${field['type']}", id="${field['name']}", name="${field['name']}")

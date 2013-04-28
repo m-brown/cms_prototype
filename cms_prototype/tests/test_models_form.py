@@ -21,35 +21,57 @@ CBOX_HTML = """
 </form>
 """.strip()
 
+NO_LABEL_HTML = """
+<form action="" method="POST">
+  <input type="text" id="name" name="name"/>
+</form>
+""".strip()
+
+
 class FormModelsTestCase(TemplateTestCase):
 
     def test_simple_form(self):
-        from cms_prototype.models.blocks.form import FormBlock, Input
+        from cms_prototype.models.blocks.form import Form, Input
 
-        form_a = FormBlock()
+        form_a = Form()
 
         field = Input(type='text', name='name', label='Name')
         form_a.fields.append(field)
         form_a.save()
 
-        form_b = FormBlock.objects(id=form_a.id).first()
+        form_b = Form.objects(id=form_a.id).first()
         self.assertEqual(form_a, form_b)
         self.assertEqual(form_b.fields[0], field)
 
         self.assertEqual(form_a.render().strip(), FORM_HTML)
 
     def test_checkbox_form(self):
-        from cms_prototype.models.blocks.form import FormBlock, Checkbox
+        from cms_prototype.models.blocks.form import Form, Checkbox
 
-        form_a = FormBlock()
+        form_a = Form()
 
         field = Checkbox(name='name', label='Name', checked=True)
         form_a.fields.append(field)
         form_a.save()
 
-        form_b = FormBlock.objects(id=form_a.id).first()
+        form_b = Form.objects(id=form_a.id).first()
         self.assertEqual(form_a, form_b)
         self.assertEqual(form_b.fields[0], field)
         self.assertEqual(form_b.fields[0].type, 'checkbox')
 
         self.assertEqual(form_a.render().strip(), CBOX_HTML)
+
+    def test_no_label_form(self):
+        from cms_prototype.models.blocks.form import Form, Input
+
+        form_a = Form()
+
+        field = Input(type='text', name='name')
+        form_a.fields.append(field)
+        form_a.save()
+
+        form_b = Form.objects(id=form_a.id).first()
+        self.assertEqual(form_a, form_b)
+        self.assertEqual(form_b.fields[0], field)
+
+        self.assertEqual(form_a.render().strip(), FORM_HTML)

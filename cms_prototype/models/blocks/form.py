@@ -18,7 +18,7 @@ class Checkbox(Input):
 
     checked = BooleanField(default=False)
 
-class FormBlock(Block):
+class Form(Block):
 
     type   = IntField(default=1)
     action = StringField(default='', required=False)

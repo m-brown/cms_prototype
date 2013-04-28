@@ -6,6 +6,7 @@ from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
 from cms_prototype.models.blocks.block import Block
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
+from cms_prototype.models.blocks.form import Form
 
 
 class Layout(EmbeddedDocument):
