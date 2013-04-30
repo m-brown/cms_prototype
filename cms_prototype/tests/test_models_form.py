@@ -74,4 +74,4 @@ class FormModelsTestCase(TemplateTestCase):
         self.assertEqual(form_a, form_b)
         self.assertEqual(form_b.fields[0], field)
 
-        self.assertEqual(form_a.render().strip(), FORM_HTML)
+        self.assertEqual(form_a.render().strip(), NO_LABEL_HTML)
