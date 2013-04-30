@@ -89,6 +89,9 @@ class SwitchableTypeField(ComplexBaseField):
         Check the values
         """
         good_val = False
+
+        print value
+
         for field in self.fields:
             try:
                 field.validate(value)

@@ -1,5 +1,5 @@
-from cms_prototype.models.site import Block
 from mongoengine import StringField
+from cms_prototype.models.blocks.block import Block
 
 
 class Link(Block):
