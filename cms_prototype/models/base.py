@@ -73,6 +73,7 @@ class SwitchableTypeField(ComplexBaseField):
 
     def __init__(self, fields, **kwargs):
         self.fields = fields
+        self._set_owner_doc = False
         super(SwitchableTypeField, self).__init__(**kwargs)
 
     def to_python(self, value):
@@ -88,10 +89,19 @@ class SwitchableTypeField(ComplexBaseField):
         """
         Check the values
         """
+
+        # Check to see if we need to set the owner document on the fields
+        # we are wrapping. We want to catch attribute errors incase this
+        # is being called before mongoengine has been initialised.
+        if not self._set_owner_doc:
+            try:
+                for field in self.fields:
+                    field.owner_document = field._owner_document = self._owner_document
+                self._set_owner_doc = True
+            except AttributeError:
+                pass
+
         good_val = False
-
-        print value
-
         for field in self.fields:
             try:
                 field.validate(value)
