@@ -1,6 +1,7 @@
 from mongoengine import BooleanField, IntField, ListField, StringField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
-from cms_prototype.models.site import Block
+from cms_prototype.models.blocks.block import Block
+
 
 class Input(EmbeddedDocument):
 

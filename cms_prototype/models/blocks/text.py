@@ -1,7 +1,8 @@
 import markdown
 
 from mongoengine import StringField
-from cms_prototype.models.site import Block
+from cms_prototype.models.blocks.block import Block
+
 
 class HTMLBlock(Block):
 
