@@ -1,4 +1,4 @@
-from cms_prototype.models.site import Block
+from cms_prototype.models.blocks.block import Block
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response

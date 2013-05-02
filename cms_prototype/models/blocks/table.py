@@ -1,5 +1,5 @@
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField
-from cms_prototype.models.site import Block
+from cms_prototype.models.blocks.block import Block
 
 
 class MongoColumn(EmbeddedDocument):

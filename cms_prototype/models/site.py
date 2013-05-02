@@ -4,7 +4,7 @@ from mongoengine import EmbeddedDocument
 from pyramid.renderers import render
 
 from cms_prototype.models.base import VersionedDocument, SwitchableTypeField
-from cms_prototype.models.blocks.block import Block
+#from cms_prototype.models.blocks.block import Block
 from cms_prototype.models.layout import Layout
 
 
@@ -19,8 +19,8 @@ class Page(VersionedDocument):
 class Site(VersionedDocument):
     name           = StringField()
     unique_name    = StringField()
-    header         = ReferenceField(Block, dbref=True)
-    footer         = ReferenceField(Block, dbref=True)
+    header         = ReferenceField('Block', dbref=True)
+    footer         = ReferenceField('Block', dbref=True)
 
 
 class UrlKey(EmbeddedDocument):
@@ -30,4 +30,4 @@ class UrlKey(EmbeddedDocument):
 
 class Url(VersionedDocument):
     key            = EmbeddedDocumentField('UrlKey', primary_key=True)
-    page           = ReferenceField(Page, dbref=True)
+    page           = ReferenceField('Page', dbref=True)
