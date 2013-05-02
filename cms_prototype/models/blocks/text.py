@@ -10,10 +10,10 @@ class HTMLBlock(Block):
 
     meta = {'renderer': '/blocks/html.jade'}
 
+
 class MarkdownBlock(HTMLBlock):
 
     def render(self, **kwargs):
         args = {'text': markdown.markdown(self.text)}
         args.update(kwargs)
         return super(MarkdownBlock, self).render(**args)
-

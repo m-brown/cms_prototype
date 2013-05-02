@@ -11,6 +11,7 @@ class Input(EmbeddedDocument):
 
     meta = {'allow_inheritance': True}
 
+
 class Checkbox(Input):
 
     def __init__(self, *args, **kwargs):
@@ -18,6 +19,7 @@ class Checkbox(Input):
         super(Checkbox, self).__init__(*args, **kwargs)
 
     checked = BooleanField(default=False)
+
 
 class Form(Block):
 
