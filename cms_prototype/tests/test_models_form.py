@@ -28,8 +28,7 @@ NO_LABEL_HTML = """
 """.strip()
 
 
-class FormModelsTestCase(TemplateTestCase):
-
+class FormRenderTestCase(TemplateTestCase):
     def test_simple_form(self):
         from cms_prototype.models.blocks.form import Form, Input
 
@@ -75,3 +74,67 @@ class FormModelsTestCase(TemplateTestCase):
         self.assertEqual(form_b.fields[0], field)
 
         self.assertEqual(form_a.render().strip(), NO_LABEL_HTML)
+
+
+class FormPostTestCase(TemplateTestCase):
+    def test_no_id(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm
+
+        f = MongoEngineForm(class_module="cms_prototype.models.blocks.link",
+                            class_name="Link")
+        f.save()
+        post = {}
+        with self.assertRaises(Exception):
+            f.process(post)
+
+    def test_correct_post(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "bar")
+
+        f = MongoEngineForm(class_module="cms_prototype.models.blocks.link",
+                            class_name="Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')])
+        f.save()
+
+        post = {}
+        post['id'] = l.id
+        post['href'] = 'bar'
+        post['text'] = 'foo'
+        f.process(post)
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "bar")
+        self.assertEqual(l.text, "foo")
+
+    def test_no_form_elements(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "bar")
+
+        f = MongoEngineForm(class_module="cms_prototype.models.blocks.link",
+                            class_name="Link")
+        f.save()
+
+        post = {}
+        post['id'] = l.id
+        post['href'] = 'bar'
+        post['text'] = 'foo'
+        f.process(post)
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "bar")

@@ -22,10 +22,33 @@ class Checkbox(Input):
 
 
 class Form(Block):
-
     type   = IntField(default=1)
     action = StringField(default='', required=False)
     method = StringField(default='POST', regex=r'(GET|POST)')
     fields = ListField(EmbeddedDocumentField(Input))
 
     meta = {'renderer': '/blocks/form.jade'}
+
+
+class MongoEngineForm(Form):
+    class_module = StringField(required=True)
+    class_name = StringField(required=True)
+
+    def process(self, post):
+        mod = __import__(self.class_module, globals, locals, [self.class_name], -1)
+        MO_object = getattr(mod, self.class_name)
+
+        if not MO_object:
+            raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(class_module, class_name))
+
+        if not 'id' in post:
+            raise Exception("No Object ID in POST.")
+
+        o = MO_object.objects.get(id=post['id'])
+
+        for field in self.fields:
+            if field.name in post:
+                o[field.name] = post[field.name]
+                print o[field.name]
+
+        o.save()
