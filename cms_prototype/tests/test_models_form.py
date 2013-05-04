@@ -77,6 +77,15 @@ class FormRenderTestCase(TemplateTestCase):
 
 
 class FormPostTestCase(TemplateTestCase):
+    def test_no_class(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm
+        f = MongoEngineForm(mongo_object_class='foo:bar')
+        f.save()
+
+        post = {}
+        with self.assertRaises(Exception):
+            f.process(post)
+
     def test_no_id(self):
         from cms_prototype.models.blocks.form import MongoEngineForm
 

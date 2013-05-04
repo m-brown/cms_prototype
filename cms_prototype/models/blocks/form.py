@@ -34,11 +34,11 @@ class MongoEngineForm(Form):
     type = StringField(default="Upsert", regex=r'(Upsert|Update)')
 
     def process(self, post):
-        mod, cls = self.mongo_object_class.split(':')
-        module = __import__(mod, globals, locals, [cls], -1)
-        MO_object = getattr(module, cls)
-
-        if not MO_object:
+        try:
+            mod, cls = self.mongo_object_class.split(':')
+            module = __import__(mod, globals, locals, [cls], -1)
+            MO_object = getattr(module, cls)
+        except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
         if self.type == 'Update' and not 'id' in post:
