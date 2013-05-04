@@ -80,7 +80,8 @@ class FormPostTestCase(TemplateTestCase):
     def test_no_id(self):
         from cms_prototype.models.blocks.form import MongoEngineForm
 
-        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link")
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            type='Update')
         f.save()
         post = {}
         with self.assertRaises(Exception):
@@ -133,5 +134,26 @@ class FormPostTestCase(TemplateTestCase):
         f.process(post)
 
         l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "bar")
+
+    def test_upsert(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')])
+        f.save()
+
+        self.assertEqual(Link.objects().count(), 0)
+
+        post = {}
+        post['href'] = 'foo'
+        post['text'] = 'bar'
+        f.process(post)
+
+        self.assertEqual(Link.objects().count(), 1)
+        l = Link.objects().first()
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "bar")

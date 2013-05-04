@@ -22,9 +22,8 @@ class Checkbox(Input):
 
 
 class Form(Block):
-    type   = IntField(default=1)
     action = StringField(default='', required=False)
-    method = StringField(default='POST', regex=r'(GET|POST)')
+    method = StringField(default='POST', regex=r'(GET|POST)', required=True)
     fields = ListField(EmbeddedDocumentField(Input))
 
     meta = {'renderer': '/blocks/form.jade'}
@@ -32,23 +31,25 @@ class Form(Block):
 
 class MongoEngineForm(Form):
     mongo_object_class = StringField(required=True)
+    type = StringField(default="Upsert", regex=r'(Upsert|Update)')
 
     def process(self, post):
         mod, cls = self.mongo_object_class.split(':')
-        mod = __import__(mod, globals, locals, [cls], -1)
-        MO_object = getattr(mod, cls)
+        module = __import__(mod, globals, locals, [cls], -1)
+        MO_object = getattr(module, cls)
 
         if not MO_object:
-            raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(class_module, class_name))
+            raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
-        if not 'id' in post:
+        if self.type == 'Update' and not 'id' in post:
             raise Exception("No Object ID in POST.")
-
-        o = MO_object.objects.get(id=post['id'])
+        elif 'id' in post:
+            o = MO_object.objects.get(id=post['id'])
+        else:
+            o = MO_object()
 
         for field in self.fields:
             if field.name in post:
                 o[field.name] = post[field.name]
-                print o[field.name]
 
         o.save()
