@@ -1,4 +1,4 @@
-from cms_prototype.tests.common import TemplateTestCase
+from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 
 
 ## FIXME: it appears pyjade doesn't format label tags nicely. Fixing that in pyjade
@@ -26,6 +26,12 @@ NO_LABEL_HTML = """
   <input type="text" id="name" name="name"/>
 </form>
 """.strip()
+
+TEXT_FROM_WITH_VALUE = """
+<form action="" method="POST">
+  <input type="text" id="text" name="text" value="foo"/>
+</form>
+"""
 
 
 class FormRenderTestCase(TemplateTestCase):
@@ -74,6 +80,22 @@ class FormRenderTestCase(TemplateTestCase):
         self.assertEqual(form_b.fields[0], field)
 
         self.assertEqual(form_a.render().strip(), NO_LABEL_HTML)
+
+    def test_value_from_population(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.text import HTMLBlock
+
+        t = HTMLBlock(text='foo')
+        t.save()
+
+        f = MongoEngineForm(mongo_object_class='cms_prototype.models.blocks.text:HTMLBlock',
+                            fields=[Input(name='text')],
+                            identity=['textID'])
+        f.populate({'textID': t.id})
+
+        self.assertEqual(f.fields[0].value, 'foo')
+        self.assertEqual(strip_html_whitespace(f.render()), 
+                        strip_html_whitespace(TEXT_FROM_WITH_VALUE))
 
 
 class FormPostTestCase(TemplateTestCase):

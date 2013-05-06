@@ -42,6 +42,12 @@ class MongoEngineForm(Form):
         except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
+    def to_mongo(self):
+        o = super(MongoEngineForm, self).to_mongo()
+        for pos, f in enumerate(self.fields):
+            o['fields'][pos]['value'] = f.value if f.value else ''
+        return o
+
 
     def populate(self, parameters):
         if len(self.identity) == 1:
