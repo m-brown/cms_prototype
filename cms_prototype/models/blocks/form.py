@@ -32,15 +32,45 @@ class Form(Block):
 class MongoEngineForm(Form):
     mongo_object_class = StringField(required=True)
     type = StringField(default="Upsert", regex=r'(Upsert|Update)')
+    identity = ListField(StringField())
 
-    def process(self, post):
+    def _get_mongoengine_class(self):
         try:
             mod, cls = self.mongo_object_class.split(':')
             module = __import__(mod, globals, locals, [cls], -1)
-            MO_object = getattr(module, cls)
+            return getattr(module, cls)
         except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
+
+    def populate(self, parameters):
+        if len(self.identity) == 1:
+            if not self.identity[0] in parameters:
+                raise Exception('Cannot populate form: missing parameter - %', prop)
+            v = parameters[self.identity[0]]
+
+            MO_object = self._get_mongoengine_class()
+            o = MO_object.objects.get(id=v)
+
+            for f in self.fields:
+                f.value = o[f.name]
+
+        if len(self.identity) > 1:
+            id = {}
+            for prop in self.identity:
+                if not prop in parameters:
+                    raise Exception('Cannot populate form: missing parameter - %', prop)
+                id[prop] = parameters[prop]
+
+            MO_object = self._get_mongoengine_class()
+            o = MO_object.objects.get(id)
+
+            for f in self.fields:
+                f.value = o[f.name]
+
+
+    def process(self, post):
+        MO_object = self._get_mongoengine_class()
         if self.type == 'Update' and not 'id' in post:
             raise Exception("No Object ID in POST.")
         elif 'id' in post:
@@ -51,5 +81,6 @@ class MongoEngineForm(Form):
         for field in self.fields:
             if field.name in post:
                 o[field.name] = post[field.name]
+                field.value = post[field.name]
 
         o.save()

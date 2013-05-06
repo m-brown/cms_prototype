@@ -166,3 +166,22 @@ class FormPostTestCase(TemplateTestCase):
         l = Link.objects().first()
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "bar")
+
+class FormPopulateTestCase(TemplateTestCase):
+    def test_populate(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['labelID'])
+        f.save()
+        p = {'labelID': l.id}
+        f.populate(p)
+
+        self.assertEqual(f.fields[0].value, 'foo')
+        self.assertEqual(f.fields[1].value, 'bar')
