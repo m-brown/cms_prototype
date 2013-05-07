@@ -94,8 +94,8 @@ class FormRenderTestCase(TemplateTestCase):
         f.populate({'textID': t.id})
 
         self.assertEqual(f.fields[0].value, 'foo')
-        self.assertEqual(strip_html_whitespace(f.render()), 
-                        strip_html_whitespace(TEXT_FROM_WITH_VALUE))
+        self.assertEqual(strip_html_whitespace(f.render()),
+                         strip_html_whitespace(TEXT_FROM_WITH_VALUE))
 
 
 class FormPostTestCase(TemplateTestCase):
@@ -188,6 +188,7 @@ class FormPostTestCase(TemplateTestCase):
         l = Link.objects().first()
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "bar")
+
 
 class FormPopulateTestCase(TemplateTestCase):
     def test_populate(self):

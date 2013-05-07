@@ -5,8 +5,8 @@ from cms_prototype.models.blocks.block import Block
 
 class Input(EmbeddedDocument):
 
-    type  = StringField(required=True, default='text')
-    name  = StringField(required=True)
+    type = StringField(required=True, default='text')
+    name = StringField(required=True)
     label = StringField()
 
     meta = {'allow_inheritance': True}
@@ -45,9 +45,9 @@ class MongoEngineForm(Form):
     def to_mongo(self):
         o = super(MongoEngineForm, self).to_mongo()
         for pos, f in enumerate(self.fields):
-            o['fields'][pos]['value'] = f.value if f.value else ''
+            if 'value' in f:
+                o['fields'][pos]['value'] = f.value
         return o
-
 
     def populate(self, parameters):
         if len(self.identity) == 1:
@@ -73,7 +73,6 @@ class MongoEngineForm(Form):
 
             for f in self.fields:
                 f.value = o[f.name]
-
 
     def process(self, post):
         MO_object = self._get_mongoengine_class()
