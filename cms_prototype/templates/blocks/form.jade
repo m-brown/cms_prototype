@@ -2,15 +2,10 @@ form(action="${action}", method="${method}")
     each field in fields
         if (field['type'] == 'checkbox')
             label(for="${field['name']}")
-                if ('value' in field)
-                    input(type="${field['type']}", id="${field['name']}", name="${field['name']}", value="${field.get('value', '')}")
-                else
-                    input(type="${field['type']}", id="${field['name']}", name="${field['name']}")
+                input(type="${field['type']}", id="${field['name']}", name="${field['name']}", value=field.get('value'))
                 ${field['label']}
         else
             if ('label' in field)
                 label(for="${field['name']}") ${field['label']}
-            if ('value' in field)
-                input(type="${field['type']}", id="${field['name']}", name="${field['name']}", value="${field.get('value', '')}")
-            else
-                input(type="${field['type']}", id="${field['name']}", name="${field['name']}")
+            input(type="${field['type']}", id="${field['name']}", name="${field['name']}", value=field.get('value'))
+
