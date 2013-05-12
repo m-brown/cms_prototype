@@ -69,7 +69,7 @@ class MongoEngineForm(Form):
                 id[prop] = parameters[prop]
 
             MO_object = self._get_mongoengine_class()
-            o = MO_object.objects.get(id)
+            o = MO_object.objects.get(**id)
 
             for f in self.fields:
                 f.value = o[f.name]
