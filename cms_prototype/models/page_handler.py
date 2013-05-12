@@ -15,24 +15,29 @@ class PageHandler:
 
     meta = {'renderer': '/page.jade'}
 
-    def __init__(self, page):
+    def __init__(self, page, inferred, get, post):
         self.page = page
+        self.params = process_params(inferred, get, post)
 
-    """
-        Code to run before blocks are processed
-    """
     def pre_block_process(self):
+        """
+            Code to run before blocks are processed
+        """
         #assume that the child class will not call super so put no code here
         return
 
     def block_process(self):
-        #assume that the child class will not call super so put no code here
-        return
+        if hasattr(self.page.layout, 'items'):
+            for block in self.page.layout.items:
+                if hasattr(block, 'process'):
+                    block.process(params)
+                if hasattr(block, 'populate'):
+                    block.populate(params)
 
-    """
-        Code to be run after blocks are processed
-    """
     def post_block_process(self):
+        """
+            Code to be run after blocks are processed
+        """
         return
 
     def render(self):
@@ -46,3 +51,7 @@ class PageHandler:
             args['layout'] = ''
 
         return render(renderer, args)
+
+
+def process_params(inferred, get, post):
+    return dict(get.items() + post.items() + inferred.items())

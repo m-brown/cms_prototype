@@ -18,9 +18,9 @@ def page(request, editor=False):
     if url.page.handler_module:
         mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1)
         HandlerClass = getattr(mod, url.page.handler_class)
-        handler = HandlerClass(page=url.page)
+        handler = HandlerClass(page=url.page, inferred={}, get={}, post={})
     else:
-        handler = PageHandler(page=url.page)
+        handler = PageHandler(page=url.page, inferred={}, get={}, post={})
 
     handler.pre_block_process()
     handler.block_process()
