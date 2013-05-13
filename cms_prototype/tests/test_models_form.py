@@ -189,8 +189,43 @@ class FormPostTestCase(TemplateTestCase):
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "bar")
 
+    def test_multivalue_id(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['labelID'])
+
+        f.process({'labelID': l.id, 'text': 'buz'})
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "buz")
+
 
 class FormPopulateTestCase(TemplateTestCase):
+    def test_get_identifier(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['labelID'])
+        self.assertDictEqual(f._get_identifier({'labelID': l.id}), {'id': l.id})
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['href', 'text'])
+        self.assertDictEqual(f._get_identifier({'href': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
+
     def test_populate(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
         from cms_prototype.models.blocks.link import Link

@@ -30,9 +30,9 @@ class PageHandler:
         if hasattr(self.page.layout, 'items'):
             for block in self.page.layout.items:
                 if hasattr(block, 'process'):
-                    block.process(params)
+                    block.process(self.params)
                 if hasattr(block, 'populate'):
-                    block.populate(params)
+                    block.populate(self.params)
 
     def post_block_process(self):
         """

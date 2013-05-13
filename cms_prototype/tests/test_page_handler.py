@@ -92,6 +92,30 @@ class Handler(TemplateTestCase):
 
         self.assertEquals(html, strip_html_whitespace(POST_MOD_HTML))
 
+    def test_form_post(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['labelID'])
+        f.save()
+        self.p.layout.items.append(f)
+        self.p.save()
+
+        h = PageHandler(page=self.p, inferred={}, get={}, post={'labelID': l.id, 'text': 'buz'})
+        h.pre_block_process()
+        h.block_process()
+        h.post_block_process()
+        h.render()
+
+        l = Link.objects.get(id=l.id)
+
+        self.assertEquals(l.text, 'buz')
+
 
 class ProcessParams(TemplateTestCase):
     def test_simple(self):

@@ -42,6 +42,21 @@ class MongoEngineForm(Form):
         except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
+    def _get_identifier(self, parameters):
+        if not self.identity or len(self.identity) == 0:
+            raise Exception('Cannot populate form: no identifier was set')
+        if len(self.identity) == 1:
+            if not self.identity[0] in parameters:
+                raise Exception('Cannot populate form: missing parameter - %', prop)
+            return {'id': parameters[self.identity[0]]}
+        else:
+            id = {}
+            for prop in self.identity:
+                if not prop in parameters:
+                    raise Exception('Cannot populate form: missing parameter - %', prop)
+                id[prop] = parameters[prop]
+            return id
+
     def to_mongo(self):
         o = super(MongoEngineForm, self).to_mongo()
         for pos, f in enumerate(self.fields):
@@ -50,42 +65,23 @@ class MongoEngineForm(Form):
         return o
 
     def populate(self, parameters):
-        if len(self.identity) == 1:
-            if not self.identity[0] in parameters:
-                raise Exception('Cannot populate form: missing parameter - %', prop)
-            v = parameters[self.identity[0]]
+        MO_class = self._get_mongoengine_class()
+        o = MO_class.objects.get(**self._get_identifier(parameters))
 
-            MO_object = self._get_mongoengine_class()
-            o = MO_object.objects.get(id=v)
+        for f in self.fields:
+            f.value = o[f.name]
 
-            for f in self.fields:
-                f.value = o[f.name]
-
-        if len(self.identity) > 1:
-            id = {}
-            for prop in self.identity:
-                if not prop in parameters:
-                    raise Exception('Cannot populate form: missing parameter - %', prop)
-                id[prop] = parameters[prop]
-
-            MO_object = self._get_mongoengine_class()
-            o = MO_object.objects.get(**id)
-
-            for f in self.fields:
-                f.value = o[f.name]
-
-    def process(self, post):
-        MO_object = self._get_mongoengine_class()
-        if self.type == 'Update' and not 'id' in post:
-            raise Exception("No Object ID in POST.")
-        elif 'id' in post:
-            o = MO_object.objects.get(id=post['id'])
-        else:
-            o = MO_object()
+    def process(self, parameters):
+        MO_class = self._get_mongoengine_class()
+        try:
+            id = self._get_identifier(parameters)
+            o = MO_class.objects.get(**id)
+        except Exception, e:
+            o = MO_class()
 
         for field in self.fields:
-            if field.name in post:
-                o[field.name] = post[field.name]
-                field.value = post[field.name]
+            if field.name in parameters:
+                o[field.name] = parameters[field.name]
+                field.value = parameters[field.name]
 
         o.save()
