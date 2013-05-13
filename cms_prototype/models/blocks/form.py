@@ -77,7 +77,10 @@ class MongoEngineForm(Form):
             id = self._get_identifier(parameters)
             o = MO_class.objects.get(**id)
         except Exception, e:
-            o = MO_class()
+            if self.type == 'Update':
+                raise e
+            else:
+                o = MO_class()
 
         for field in self.fields:
             if field.name in parameters:

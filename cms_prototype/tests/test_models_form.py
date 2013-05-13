@@ -131,7 +131,8 @@ class FormPostTestCase(TemplateTestCase):
 
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
-                                    Input(type='text', name='text')])
+                                    Input(type='text', name='text')],
+                            identity=['id'])
         f.save()
 
         post = {}
