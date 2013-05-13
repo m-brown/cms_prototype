@@ -237,3 +237,19 @@ class FormPopulateTestCase(TemplateTestCase):
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(f.fields[1].value, 'bar')
+
+    def test_populate_multi_missing(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['href', 'text'])
+        f.save()
+        p = {'href': 'foo'}
+        with self.assertRaises(Exception):
+            f.populate(p)
