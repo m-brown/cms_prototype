@@ -1,4 +1,5 @@
 from pyramid.renderers import render
+from cms_prototype.models.blocks.form import Form
 
 
 class PageHandler:
@@ -18,6 +19,7 @@ class PageHandler:
     def __init__(self, page, inferred, get, post):
         self.page = page
         self.params = process_params(inferred, get, post)
+        self.is_postback = len(post) > 0
 
     def pre_block_process(self):
         """
@@ -29,6 +31,8 @@ class PageHandler:
     def block_process(self):
         if hasattr(self.page.layout, 'items'):
             for block in self.page.layout.items:
+                if isinstance(block, Form) and self.is_postback:
+                    block.post(self.params)
                 if hasattr(block, 'process'):
                     block.process(self.params)
                 if hasattr(block, 'populate'):

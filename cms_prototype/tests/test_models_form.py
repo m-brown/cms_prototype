@@ -106,7 +106,7 @@ class FormPostTestCase(TemplateTestCase):
 
         post = {}
         with self.assertRaises(Exception):
-            f.process(post)
+            f.post(post)
 
     def test_no_id(self):
         from cms_prototype.models.blocks.form import MongoEngineForm
@@ -116,7 +116,7 @@ class FormPostTestCase(TemplateTestCase):
         f.save()
         post = {}
         with self.assertRaises(Exception):
-            f.process(post)
+            f.post(post)
 
     def test_correct_post(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
@@ -139,7 +139,7 @@ class FormPostTestCase(TemplateTestCase):
         post['id'] = l.id
         post['href'] = 'bar'
         post['text'] = 'foo'
-        f.process(post)
+        f.post(post)
 
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "bar")
@@ -163,7 +163,7 @@ class FormPostTestCase(TemplateTestCase):
         post['id'] = l.id
         post['href'] = 'bar'
         post['text'] = 'foo'
-        f.process(post)
+        f.post(post)
 
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "foo")
@@ -183,7 +183,7 @@ class FormPostTestCase(TemplateTestCase):
         post = {}
         post['href'] = 'foo'
         post['text'] = 'bar'
-        f.process(post)
+        f.post(post)
 
         self.assertEqual(Link.objects().count(), 1)
         l = Link.objects().first()
@@ -201,7 +201,7 @@ class FormPostTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity=['labelID'])
 
-        f.process({'labelID': l.id, 'text': 'buz'})
+        f.post({'labelID': l.id, 'text': 'buz'})
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "buz")

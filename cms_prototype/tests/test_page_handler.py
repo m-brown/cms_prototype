@@ -92,7 +92,7 @@ class Handler(TemplateTestCase):
 
         self.assertEquals(html, strip_html_whitespace(POST_MOD_HTML))
 
-    def test_form_post(self):
+    def test_form_post_update(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
         from cms_prototype.models.blocks.link import Link
         l = Link(href="foo", text="bar")
@@ -115,6 +115,48 @@ class Handler(TemplateTestCase):
         l = Link.objects.get(id=l.id)
 
         self.assertEquals(l.text, 'buz')
+
+    def test_form_post_create_object(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity=['labelID'])
+        f.save()
+        self.p.layout.items.append(f)
+        self.p.save()
+
+        #a page load should not create anything
+        h = PageHandler(page=self.p, inferred={}, get={}, post={})
+        h.pre_block_process()
+        h.block_process()
+        h.post_block_process()
+        h.render()
+
+        self.assertEquals(Link.objects.count(), 0)
+
+        #a post should create the object
+        h = PageHandler(page=self.p, inferred={}, get={}, post={'href': 'foo', 'text': 'bar'})
+        h.pre_block_process()
+        h.block_process()
+        h.post_block_process()
+        h.render()
+
+        self.assertEquals(Link.objects.count(), 1)
+        l = Link.objects.get()
+        self.assertEquals(l['href'], 'foo')
+        self.assertEquals(l['text'], 'bar')
+
+        #a simple reload should not create anything
+        h = PageHandler(page=self.p, inferred={}, get={}, post={})
+        h.pre_block_process()
+        h.block_process()
+        h.post_block_process()
+        h.render()
+
+        self.assertEquals(Link.objects.count(), 1)
 
 
 class ProcessParams(TemplateTestCase):

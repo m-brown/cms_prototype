@@ -75,7 +75,7 @@ class MongoEngineForm(Form):
         for f in self.fields:
             f.value = o[f.name]
 
-    def process(self, parameters):
+    def post(self, parameters):
         MO_class = self._get_mongoengine_class()
         try:
             id = self._get_identifier(parameters)
@@ -90,5 +90,7 @@ class MongoEngineForm(Form):
             if field.name in parameters:
                 o[field.name] = parameters[field.name]
                 field.value = parameters[field.name]
+            else:
+                field.value = o[field.name]
 
         o.save()
