@@ -87,10 +87,11 @@ class MongoEngineForm(Form):
                 o = MO_class()
 
         for field in self.fields:
-            if field.name in parameters:
-                o[field.name] = parameters[field.name]
-                field.value = parameters[field.name]
-            else:
-                field.value = o[field.name]
+            if field.type != 'submit':
+                if field.name in parameters:
+                    o[field.name] = parameters[field.name]
+                    field.value = parameters[field.name]
+                else:
+                    field.value = o[field.name]
 
         o.save()
