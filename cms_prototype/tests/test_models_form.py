@@ -253,8 +253,11 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity=['labelID'])
 
-        with self.assertRaises(Exception):
-            f.populate({})
+        f.populate({})
+        with self.assertRaises(AttributeError):
+            a = f.fields[0].value
+        with self.assertRaises(AttributeError):
+            a = f.fields[1].value
 
     def test_populate_multivalue(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
@@ -287,5 +290,8 @@ class FormPopulateTestCase(TemplateTestCase):
                             identity=['href', 'text'])
         f.save()
         p = {'href': 'foo'}
-        with self.assertRaises(Exception):
-            f.populate(p)
+        f.populate(p)
+        with self.assertRaises(AttributeError):
+            a = f.fields[0].value
+        with self.assertRaises(AttributeError):
+            a = f.fields[1].value

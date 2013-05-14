@@ -47,7 +47,7 @@ class MongoEngineForm(Form):
             raise Exception('Cannot populate form: no identifier was set')
         if len(self.identity) == 1:
             if not self.identity[0] in parameters:
-                raise Exception('Cannot populate form: missing parameter - %', prop)
+                raise Exception('Cannot populate form: missing parameter - %', self.identity[0])
             return {'id': parameters[self.identity[0]]}
         else:
             id = {}
@@ -66,7 +66,11 @@ class MongoEngineForm(Form):
 
     def populate(self, parameters):
         MO_class = self._get_mongoengine_class()
-        o = MO_class.objects.get(**self._get_identifier(parameters))
+        try:
+            id = self._get_identifier(parameters)
+        except Exception, e:
+            return
+        o = MO_class.objects.get(**id)
 
         for f in self.fields:
             f.value = o[f.name]
