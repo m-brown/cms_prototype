@@ -5,7 +5,7 @@ from cms_prototype.models.site import Site, Page, Url, UrlKey
 from cms_prototype.models.site import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
-from cms_prototype.models.blocks.form import Form, Input
+from cms_prototype.models.blocks.form import MongoEngineForm, Input
 
 
 connect('cms', host=os.getenv('DB_HOST', 'localhost'))
@@ -35,7 +35,8 @@ url.save()
 
 
 #create new site
-f = Form()
+f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Site',
+					identity=['unique_name'])
 f.fields.append(Input(name='name', label='Name'))
 f.fields.append(Input(name='unique_name', label='Unique Name'))
 f.fields.append(Input(name='submit', type='submit'))
