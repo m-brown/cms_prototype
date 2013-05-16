@@ -90,7 +90,7 @@ class FormRenderTestCase(TemplateTestCase):
 
         f = MongoEngineForm(mongo_object_class='cms_prototype.models.blocks.text:HTMLBlock',
                             fields=[Input(name='text')],
-                            identity=['textID'])
+                            identity={'textID': 'id'})
         f.populate({'textID': t.id})
 
         self.assertEqual(f.fields[0].value, 'foo')
@@ -132,7 +132,7 @@ class FormPostTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['id'])
+                            identity={'id': 'id'})
         f.save()
 
         post = {}
@@ -199,7 +199,7 @@ class FormPostTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
 
         f.post({'labelID': l.id, 'text': 'buz'})
         l = Link.objects.get(id=l.id)
@@ -218,13 +218,13 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
         self.assertDictEqual(f._get_identifier({'labelID': l.id}), {'id': l.id})
 
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['href', 'text'])
+                            identity={'href': 'href', 'text': 'text'})
         self.assertDictEqual(f._get_identifier({'href': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
 
     def test_populate(self):
@@ -237,7 +237,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
         f.save()
         p = {'labelID': l.id}
         f.populate(p)
@@ -251,7 +251,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
 
         f.populate({})
         with self.assertRaises(AttributeError):
@@ -269,7 +269,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['href', 'text'])
+                            identity={'href': 'href', 'text': 'href'})
         f.save()
         p = {'href': 'foo', 'text': 'bar'}
         f.populate(p)
@@ -287,7 +287,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['href', 'text'])
+                            identity={'href': 'href', 'text': 'href'})
         f.save()
         p = {'href': 'foo'}
         f.populate(p)

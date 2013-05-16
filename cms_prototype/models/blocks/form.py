@@ -1,4 +1,4 @@
-from mongoengine import BooleanField, IntField, ListField, StringField
+from mongoengine import BooleanField, IntField, ListField, StringField, MapField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
 from cms_prototype.models.blocks.block import Block
 
@@ -32,7 +32,7 @@ class Form(Block):
 class MongoEngineForm(Form):
     mongo_object_class = StringField(required=True)
     type = StringField(default="Upsert", regex=r'(Upsert|Update)')
-    identity = ListField(StringField())
+    identity = MapField(field=StringField())
 
     def _get_mongoengine_class(self):
         try:
@@ -45,17 +45,12 @@ class MongoEngineForm(Form):
     def _get_identifier(self, parameters):
         if not self.identity or len(self.identity) == 0:
             raise Exception('Cannot populate form: no identifier was set')
-        if len(self.identity) == 1:
-            if not self.identity[0] in parameters:
-                raise Exception('Cannot populate form: missing parameter - %', self.identity[0])
-            return {'id': parameters[self.identity[0]]}
-        else:
-            id = {}
-            for prop in self.identity:
-                if not prop in parameters:
-                    raise Exception('Cannot populate form: missing parameter - %', prop)
-                id[prop] = parameters[prop]
-            return id
+        id = {}
+        for prop in self.identity:
+            if not prop in parameters:
+                raise Exception('Cannot populate form: missing parameter - %', prop)
+            id[self.identity[prop]] = parameters[prop]
+        return id
 
     def to_mongo(self):
         o = super(MongoEngineForm, self).to_mongo()

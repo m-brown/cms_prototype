@@ -101,7 +101,7 @@ class Handler(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
         f.save()
         self.p.layout.items.append(f)
         self.p.save()
@@ -123,7 +123,7 @@ class Handler(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity=['labelID'])
+                            identity={'labelID': 'id'})
         f.save()
         self.p.layout.items.append(f)
         self.p.save()

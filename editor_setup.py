@@ -36,7 +36,7 @@ url.save()
 
 #create new site
 f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Site',
-					identity=['unique_name'])
+                    identity={'unique_name': 'unique_name'})
 f.fields.append(Input(name='name', label='Name'))
 f.fields.append(Input(name='unique_name', label='Unique Name'))
 f.fields.append(Input(name='submit', type='submit'))
