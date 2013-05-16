@@ -68,7 +68,8 @@ class MongoEngineForm(Form):
         o = MO_class.objects.get(**id)
 
         for f in self.fields:
-            f.value = o[f.name]
+            if f.type != 'submit':
+                f.value = o[f.name]
 
     def post(self, parameters):
         MO_class = self._get_mongoengine_class()

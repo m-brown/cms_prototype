@@ -295,3 +295,22 @@ class FormPopulateTestCase(TemplateTestCase):
             a = f.fields[0].value
         with self.assertRaises(AttributeError):
             a = f.fields[1].value
+
+    def test_populate_with_submit(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text'),
+                                    Input(type='submit', name='save')],
+                            identity={'href': 'href', 'text': 'href'})
+        f.save()
+        p = {'href': 'foo', 'text': 'bar'}
+        f.populate(p)
+
+        self.assertEqual(f.fields[0].value, 'foo')
+        self.assertEqual(f.fields[1].value, 'bar')
