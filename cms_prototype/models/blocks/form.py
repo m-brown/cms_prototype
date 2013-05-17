@@ -4,7 +4,8 @@ from cms_prototype.models.blocks.block import Block
 
 
 class Input(EmbeddedDocument):
-
+    html_id = StringField()
+    html_class = StringField()
     type = StringField(required=True, default='text')
     name = StringField(required=True)
     label = StringField()

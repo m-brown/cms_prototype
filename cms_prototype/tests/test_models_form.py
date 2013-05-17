@@ -6,30 +6,45 @@ from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 # will suffice.
 
 FORM_HTML = """
-<form action="" method="POST">
-  <label for="name">Name</label>
-  <input type="text" id="name" name="name"/>
+<form action="" method="POST" class="form-horizontal">
+  <div class="control-group">
+    <label for="name" class="control-label">Name</label>
+    <div class="controls">
+      <input type="text" name="name"/>
+    </div>
+  </div>
 </form>
 """.strip()
 
 CBOX_HTML = """
-<form action="" method="POST">
-  <label for="name">
-    <input type="checkbox" id="name" name="name"/>Name
-
-  </label>
+<form action="" method="POST" class="form-horizontal">
+  <div class="control-group">
+    <div class="controls">
+      <label for="name" class="control-label">
+        <input type="checkbox" name="name"/>Name
+      </label>
+    </div>
+  </div>
 </form>
 """.strip()
 
 NO_LABEL_HTML = """
-<form action="" method="POST">
-  <input type="text" id="name" name="name"/>
+<form action="" method="POST" class="form-horizontal">
+  <div class="control-group">
+    <div class="controls">
+      <input type="text" name="name"/>
+    </div>
+  </div>
 </form>
 """.strip()
 
 TEXT_FROM_WITH_VALUE = """
-<form action="" method="POST">
-  <input type="text" id="text" name="text" value="foo"/>
+<form action="" method="POST" class="form-horizontal">
+  <div class="control-group">
+    <div class="controls">
+      <input type="text" name="text" value="foo"/>
+    </div>
+  </div>
 </form>
 """
 
@@ -48,7 +63,7 @@ class FormRenderTestCase(TemplateTestCase):
         self.assertEqual(form_a, form_b)
         self.assertEqual(form_b.fields[0], field)
 
-        self.assertEqual(form_a.render().strip(), FORM_HTML)
+        self.assertEqual(strip_html_whitespace(form_a.render().strip()), strip_html_whitespace(FORM_HTML))
 
     def test_checkbox_form(self):
         from cms_prototype.models.blocks.form import Form, Checkbox
@@ -64,7 +79,7 @@ class FormRenderTestCase(TemplateTestCase):
         self.assertEqual(form_b.fields[0], field)
         self.assertEqual(form_b.fields[0].type, 'checkbox')
 
-        self.assertEqual(form_a.render().strip(), CBOX_HTML)
+        self.assertEqual(strip_html_whitespace(form_a.render().strip()), strip_html_whitespace(CBOX_HTML))
 
     def test_no_label_form(self):
         from cms_prototype.models.blocks.form import Form, Input
@@ -79,7 +94,7 @@ class FormRenderTestCase(TemplateTestCase):
         self.assertEqual(form_a, form_b)
         self.assertEqual(form_b.fields[0], field)
 
-        self.assertEqual(form_a.render().strip(), NO_LABEL_HTML)
+        self.assertEqual(strip_html_whitespace(form_a.render().strip()), strip_html_whitespace(NO_LABEL_HTML))
 
     def test_value_from_population(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input

@@ -39,7 +39,7 @@ f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Site',
                     identity={'unique_name': 'unique_name'})
 f.fields.append(Input(name='name', label='Name'))
 f.fields.append(Input(name='unique_name', label='Unique Name'))
-f.fields.append(Input(name='submit', type='submit'))
+f.fields.append(Input(name='submit', type='submit', html_class='btn'))
 f.save()
 l = Layout()
 l.items.append(f)
