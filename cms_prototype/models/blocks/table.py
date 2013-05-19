@@ -7,7 +7,7 @@ class MongoColumn(EmbeddedDocument):
     display = StringField()
 
 
-class MongoTable(Block):
+class MongoEngineTable(Block):
     database = StringField(required=True)
     collection = StringField(required=True)
     columns = ListField(EmbeddedDocumentField(MongoColumn))

@@ -1,18 +1,18 @@
 from cms_prototype.tests.common import TemplateTestCase
-from cms_prototype.models.blocks.table import MongoTable, MongoColumn
+from cms_prototype.models.blocks.table import MongoEngine, MongoColumn
 from cms_prototype.models.blocks.block import Block
 
 
-class MongoTableTest(TemplateTestCase):
+class MongoEngineTest(TemplateTestCase):
     def setUp(self):
-        super(MongoTableTest, self).setUp()
-        self.db = MongoTable._get_collection().database
+        super(MongoEngineTest, self).setUp()
+        self.db = MongoEngine._get_collection().database
 
         self.db.block.remove()
         self.db.versioned_block.remove()
 
     def test_creation_and_population(self):
-        t = MongoTable(database=self.db.name, collection='block')
+        t = MongoEngine(database=self.db.name, collection='block')
         t.save()
         t.populate()
 
@@ -20,7 +20,7 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(len(t.data), 1)
 
     def test_multiple_rows(self):
-        t = MongoTable(database=self.db.name, collection='block')
+        t = MongoEngine(database=self.db.name, collection='block')
         t.save()
         t.populate()
 
@@ -42,10 +42,10 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(len(t.data), 3)
 
     def test_render(self):
-        t = MongoTable(database=self.db.name, collection='block')
+        t = MongoEngine(database=self.db.name, collection='block')
         t.save()
 
-        a = MongoTable.objects(id=t.id).first()
+        a = MongoEngine.objects(id=t.id).first()
         a.populate()
 
         html = a.render()
@@ -55,7 +55,7 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_render_columns(self):
-        t = MongoTable(database=self.db.name, collection='block', name='test table')
+        t = MongoEngine(database=self.db.name, collection='block', name='test table')
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.columns.append(MongoColumn(field='_cls', display='Class'))
         t.save()
@@ -69,7 +69,7 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(html.count('<td>'), 2)
 
     def test_render_nopopulate(self):
-        t = MongoTable(database=self.db.name, collection='block')
+        t = MongoEngine(database=self.db.name, collection='block')
         t.save()
 
         html = t.render()
@@ -77,7 +77,7 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_sort(self):
-        t = MongoTable(database=self.db.name, collection='block', name='table', sort={'name': 1})
+        t = MongoEngine(database=self.db.name, collection='block', name='table', sort={'name': 1})
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.save()
 
@@ -102,7 +102,7 @@ class MongoTableTest(TemplateTestCase):
         self.assertEqual(t.data[3]['name'], 'table')
 
     def test_query(self):
-        t = MongoTable(database=self.db.name, collection='block', name='table', spec={'name': 'table'})
+        t = MongoEngine(database=self.db.name, collection='block', name='table', spec={'name': 'table'})
         t.save()
         t.populate()
 
