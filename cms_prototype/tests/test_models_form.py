@@ -1,3 +1,4 @@
+from pyramid.httpexceptions import HTTPFound
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 
 
@@ -150,10 +151,7 @@ class FormPostTestCase(TemplateTestCase):
                             identity={'id': 'id'})
         f.save()
 
-        post = {}
-        post['id'] = l.id
-        post['href'] = 'bar'
-        post['text'] = 'foo'
+        post = {'id': l.id, 'href': 'bar', 'text': 'foo'}
         f.post(post)
 
         l = Link.objects.get(id=l.id)
@@ -220,6 +218,32 @@ class FormPostTestCase(TemplateTestCase):
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "buz")
+
+    def test_next_page(self):
+        from cms_prototype.models.blocks.form import MongoEngineForm, Input
+        from cms_prototype.models.blocks.link import Link
+
+        l = Link(href="foo", text="bar")
+        l.save()
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "foo")
+        self.assertEqual(l.text, "bar")
+
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href'),
+                                    Input(type='text', name='text')],
+                            identity={'id': 'id'},
+                            next_page='foo')
+        f.save()
+
+        post = {'id': l.id, 'href': 'bar', 'text': 'foo'}
+        with self.assertRaises(HTTPFound):
+            f.post(post)
+
+        l = Link.objects.get(id=l.id)
+        self.assertEqual(l.href, "bar")
+        self.assertEqual(l.text, "foo")
 
 
 class FormPopulateTestCase(TemplateTestCase):

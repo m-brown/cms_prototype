@@ -1,3 +1,4 @@
+from pyramid.httpexceptions import HTTPFound
 from mongoengine import BooleanField, IntField, ListField, StringField, MapField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
 from cms_prototype.models.blocks.block import Block
@@ -26,6 +27,7 @@ class Form(Block):
     action = StringField(default='', required=False)
     method = StringField(default='POST', regex=r'(GET|POST)', required=True)
     fields = ListField(EmbeddedDocumentField(Input))
+    next_page = StringField()
 
     meta = {'renderer': '/blocks/form.jade'}
 
@@ -92,3 +94,5 @@ class MongoEngineForm(Form):
                     field.value = o[field.name]
 
         o.save()
+        if self.next_page:
+            raise HTTPFound(location=self.next_page)
