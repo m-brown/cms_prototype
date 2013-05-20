@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.blocks.block import Block
-from cms_prototype.models.blocks.table import MongoTable, MongoColumn
+from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 from cms_prototype.models.blocks.text import HTMLBlock
 from bson.objectid import ObjectId
 
@@ -39,7 +39,7 @@ class BlockViewTest(TemplateTestCase):
     def test_table_block(self):
         from cms_prototype.views.block import block
 
-        t = MongoTable(database=self.db.name, collection='block', name='test table')
+        t = MongoEngineTable(database=self.db.name, collection='block', name='test table')
         t.columns.append(MongoColumn(field='name'))
         t.save()
 

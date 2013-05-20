@@ -6,6 +6,7 @@ from cms_prototype.models.site import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
 from cms_prototype.models.blocks.form import MongoEngineForm, Input
+from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 
 
 connect('cms', host=os.getenv('DB_HOST', 'localhost'))
@@ -49,4 +50,21 @@ p.save()
 
 k = UrlKey(site=s, url='create')
 url = Url(key=k, page=p)
+url.save()
+
+
+#pages
+t = MongoEngineTable(database='cms',
+                    collection='url',
+                    columns=[MongoColumn(field='id.url', display='URL'),
+                            MongoColumn(field='page.$ref', display='Page Type')],
+                    spec={'site': '_id.site'})
+t.save()
+
+l = Layout()
+l.items.append(t)
+p = Page(name='URL List', layout=l)
+p.save()
+
+url = Url(key=UrlKey(site=s, url='pages'), page=p)
 url.save()

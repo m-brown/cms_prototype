@@ -1,4 +1,4 @@
-from mongoengine import EmbeddedDocument, EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField
+from mongoengine import EmbeddedDocument, EmbeddedDocumentField, ReferenceField, StringField, DictField, ListField, MapField
 from cms_prototype.models.blocks.block import Block
 
 
@@ -11,19 +11,19 @@ class MongoEngineTable(Block):
     database = StringField(required=True)
     collection = StringField(required=True)
     columns = ListField(EmbeddedDocumentField(MongoColumn))
-    spec = DictField()
+    spec = MapField(field=StringField())
     sort = DictField()
 
     meta = {'renderer': '/blocks/table.jade'}
 
     def render(self, **kwargs):
         if not hasattr(self, 'data'):
-            self.populate()
+            self.populate({})
         args = {'data': self.data}
         args.update(kwargs)
-        return super(MongoTable, self).render(**args)
+        return super(MongoEngineTable, self).render(**args)
 
-    def populate(self):
+    def populate(self, parameters):
         sort = []
         for key, value in self.sort.iteritems():
             sort.append((key, value))
@@ -32,7 +32,8 @@ class MongoEngineTable(Block):
         for col in self.columns:
             fields[col.field] = 1
 
-        cursor = MongoTable._get_collection().database[self.collection].find(self.spec, fields=fields, sort=sort)
+        spec = self.mapfield_to_dict(self.spec, parameters) if self.spec else {}
+        cursor = MongoEngineTable._get_collection().database[self.collection].find(spec, fields=fields, sort=sort)
         self.data = []
         for row in cursor:
             r = {}

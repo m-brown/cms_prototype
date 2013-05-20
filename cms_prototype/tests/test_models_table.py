@@ -1,28 +1,28 @@
 from cms_prototype.tests.common import TemplateTestCase
-from cms_prototype.models.blocks.table import MongoEngine, MongoColumn
+from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 from cms_prototype.models.blocks.block import Block
 
 
-class MongoEngineTest(TemplateTestCase):
+class MongoEngineTableTest(TemplateTestCase):
     def setUp(self):
-        super(MongoEngineTest, self).setUp()
-        self.db = MongoEngine._get_collection().database
+        super(MongoEngineTableTest, self).setUp()
+        self.db = MongoEngineTable._get_collection().database
 
         self.db.block.remove()
         self.db.versioned_block.remove()
 
     def test_creation_and_population(self):
-        t = MongoEngine(database=self.db.name, collection='block')
+        t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
-        t.populate()
+        t.populate({})
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
 
     def test_multiple_rows(self):
-        t = MongoEngine(database=self.db.name, collection='block')
+        t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
-        t.populate()
+        t.populate({})
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
@@ -30,23 +30,23 @@ class MongoEngineTest(TemplateTestCase):
         b = Block(name='test')
         b.save()
 
-        t.populate()
+        t.populate({})
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 2)
 
         b = Block(name='test2')
         b.save()
 
-        t.populate()
+        t.populate({})
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 3)
 
     def test_render(self):
-        t = MongoEngine(database=self.db.name, collection='block')
+        t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
 
-        a = MongoEngine.objects(id=t.id).first()
-        a.populate()
+        a = MongoEngineTable.objects(id=t.id).first()
+        a.populate({})
 
         html = a.render()
 
@@ -55,12 +55,12 @@ class MongoEngineTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_render_columns(self):
-        t = MongoEngine(database=self.db.name, collection='block', name='test table')
+        t = MongoEngineTable(database=self.db.name, collection='block', name='test table')
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.columns.append(MongoColumn(field='_cls', display='Class'))
         t.save()
 
-        t.populate()
+        t.populate({})
         html = t.render()
 
         self.assertIn('<table', html)
@@ -69,7 +69,7 @@ class MongoEngineTest(TemplateTestCase):
         self.assertEqual(html.count('<td>'), 2)
 
     def test_render_nopopulate(self):
-        t = MongoEngine(database=self.db.name, collection='block')
+        t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
 
         html = t.render()
@@ -77,7 +77,7 @@ class MongoEngineTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_sort(self):
-        t = MongoEngine(database=self.db.name, collection='block', name='table', sort={'name': 1})
+        t = MongoEngineTable(database=self.db.name, collection='block', name='table', sort={'name': 1})
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.save()
 
@@ -88,7 +88,7 @@ class MongoEngineTest(TemplateTestCase):
         b1 = Block(name='test1')
         b1.save()
 
-        t.populate()
+        t.populate({})
         self.assertEqual(len(t.data), 4)
         self.assertEqual(t.data[0]['name'], 'table')
         self.assertEqual(t.data[3]['name'], 'test3')
@@ -96,15 +96,15 @@ class MongoEngineTest(TemplateTestCase):
         #test reverse order
         t.sort = {'name': -1}
         t.save()
-        t.populate()
+        t.populate({})
         self.assertEqual(len(t.data), 4)
         self.assertEqual(t.data[0]['name'], 'test3')
         self.assertEqual(t.data[3]['name'], 'table')
 
     def test_query(self):
-        t = MongoEngine(database=self.db.name, collection='block', name='table', spec={'name': 'table'})
+        t = MongoEngineTable(database=self.db.name, collection='block', name='table', spec={'name': 'name'})
         t.save()
-        t.populate()
+        t.populate({'name': 'table'})
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
@@ -112,6 +112,6 @@ class MongoEngineTest(TemplateTestCase):
         b = Block(name='test')
         b.save()
 
-        t.populate()
+        t.populate({'name': 'table'})
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
