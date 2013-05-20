@@ -254,17 +254,19 @@ class FormPopulateTestCase(TemplateTestCase):
         l = Link(href="foo", text="bar")
         l.save()
 
+        ident = {'labelID': 'id'}
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'labelID': 'id'})
-        self.assertDictEqual(f._get_identifier({'labelID': l.id}), {'id': l.id})
+                            identity=ident)
+        self.assertDictEqual(f.mapfield_to_dict(ident, {'labelID': l.id}), {'id': l.id})
 
+        ident = {'href': 'href', 'text': 'text'}
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'href': 'href', 'text': 'text'})
-        self.assertDictEqual(f._get_identifier({'href': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
+                            identity=ident)
+        self.assertDictEqual(f.mapfield_to_dict(ident, {'href': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
 
     def test_populate(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input

@@ -45,16 +45,6 @@ class MongoEngineForm(Form):
         except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
-    def _get_identifier(self, parameters):
-        if not self.identity or len(self.identity) == 0:
-            raise Exception('Cannot populate form: no identifier was set')
-        id = {}
-        for prop in self.identity:
-            if not prop in parameters:
-                raise Exception('Cannot populate form: missing parameter - %', prop)
-            id[self.identity[prop]] = parameters[prop]
-        return id
-
     def to_mongo(self):
         o = super(MongoEngineForm, self).to_mongo()
         for pos, f in enumerate(self.fields):
@@ -65,7 +55,7 @@ class MongoEngineForm(Form):
     def populate(self, parameters):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self._get_identifier(parameters)
+            id = self.mapfield_to_dict(self.identity, parameters)
         except Exception, e:
             return
         o = MO_class.objects.get(**id)
@@ -77,7 +67,7 @@ class MongoEngineForm(Form):
     def post(self, parameters):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self._get_identifier(parameters)
+            id = self.mapfield_to_dict(self.identity, parameters)
             o = MO_class.objects.get(**id)
         except Exception, e:
             if self.type == 'Update':

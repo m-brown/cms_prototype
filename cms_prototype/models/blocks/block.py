@@ -23,3 +23,13 @@ class Block(VersionedDocument):
             raise Exception('No renderer found')
 
         return render(renderer, args)
+
+    def mapfield_to_dict(self, mapfield, parameters):
+        if not mapfield or len(mapfield) == 0:
+            raise Exception('Cannot populate dict: no mapfield was given')
+        d = {}
+        for f in mapfield:
+            if not f in parameters:
+                raise Exception('Cannot populate dict: missing parameter - %s' % f)
+            d[mapfield[f]] = parameters[f]
+        return d
