@@ -1,6 +1,7 @@
+from pyramid import testing
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
-from cms_prototype.models.page_handler import PageHandler, process_params
-from cms_prototype.models.site import Page
+from cms_prototype.models.page_handler import PageHandler
+from cms_prototype.models.site import Page, Url
 from cms_prototype.models.layout import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 
@@ -45,12 +46,12 @@ class PreProcessHandler(PageHandler):
     def pre_block_process(self):
         b = HTMLBlock(text='bar')
         b.save()
-        self.page.layout.items.append(b)
+        self.request.url.page.layout.items.append(b)
 
 
 class PostProcessHandler(PageHandler):
     def post_block_process(self):
-        self.page.layout.items[0].text = 'bar'
+        self.request.url.page.layout.items[0].text = 'bar'
 
 
 class Handler(TemplateTestCase):
@@ -63,8 +64,11 @@ class Handler(TemplateTestCase):
         self.p = Page(layout=l)
         self.p.save()
 
+        self.request = testing.DummyRequest()
+        self.request.url = Url(page=self.p)
+
     def test_non_modified_render(self):
-        h = PageHandler(page=self.p, inferred={}, get={}, post={})
+        h = PageHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -74,7 +78,7 @@ class Handler(TemplateTestCase):
 
     def test_pre_process(self):
         TestHandler = __import__('cms_prototype.tests.test_page_handler', globals(), locals(), ['PreProcessHandler'], -1).PreProcessHandler
-        h = TestHandler(page=self.p, inferred={}, get={}, post={})
+        h = TestHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -84,7 +88,7 @@ class Handler(TemplateTestCase):
 
     def test_post_process(self):
         TestHandler = __import__('cms_prototype.tests.test_page_handler', globals(), locals(), ['PostProcessHandler'], -1).PostProcessHandler
-        h = TestHandler(page=self.p, inferred={}, get={}, post={})
+        h = TestHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -106,7 +110,8 @@ class Handler(TemplateTestCase):
         self.p.layout.items.append(f)
         self.p.save()
 
-        h = PageHandler(page=self.p, inferred={}, get={}, post={'labelID': l.id, 'text': 'buz'})
+        self.request.POST = {'labelID': l.id, 'text': 'buz'}
+        h = PageHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -129,7 +134,7 @@ class Handler(TemplateTestCase):
         self.p.save()
 
         #a page load should not create anything
-        h = PageHandler(page=self.p, inferred={}, get={}, post={})
+        h = PageHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -138,7 +143,8 @@ class Handler(TemplateTestCase):
         self.assertEquals(Link.objects.count(), 0)
 
         #a post should create the object
-        h = PageHandler(page=self.p, inferred={}, get={}, post={'href': 'foo', 'text': 'bar'})
+        self.request.POST = {'href': 'foo', 'text': 'bar'}
+        h = PageHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
@@ -150,22 +156,11 @@ class Handler(TemplateTestCase):
         self.assertEquals(l['text'], 'bar')
 
         #a simple reload should not create anything
-        h = PageHandler(page=self.p, inferred={}, get={}, post={})
+        self.request.POST = {}
+        h = PageHandler(request=self.request)
         h.pre_block_process()
         h.block_process()
         h.post_block_process()
         h.render()
 
         self.assertEquals(Link.objects.count(), 1)
-
-
-class ProcessParams(TemplateTestCase):
-    def test_simple(self):
-        ans = process_params({'foo': 'foo'}, {'bar': 'bar'}, {'buz': 'buz'})
-
-        self.assertDictEqual(ans, {'foo': 'foo', 'bar': 'bar', 'buz': 'buz'})
-
-    def test_overwrite(self):
-        ans = process_params({'foo': 'foo'}, {'foo': 'bar'}, {'foo': 'buz'})
-
-        self.assertDictEqual(ans, {'foo': 'foo'})

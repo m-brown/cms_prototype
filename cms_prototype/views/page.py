@@ -15,12 +15,17 @@ def page(request, editor=False):
     if not url:
         raise HTTPNotFound()
 
+    #attach bespoke objects to request
+    request.site = site
+    request.url = url
+    request.PARAMS = dict(request.GET.items())#TODO - add infered
+
     if url.page.handler_module:
         mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1)
         HandlerClass = getattr(mod, url.page.handler_class)
-        handler = HandlerClass(page=url.page, inferred={}, get=request.GET, post=request.POST)
+        handler = HandlerClass(request=request)
     else:
-        handler = PageHandler(page=url.page, inferred={}, get=request.GET, post=request.POST)
+        handler = PageHandler(request=request)
 
     handler.pre_block_process()
     handler.block_process()

@@ -2,7 +2,7 @@ from pyramid.renderers import render
 from cms_prototype.models.blocks.form import Form
 
 
-class PageHandler:
+class PageHandler(object):
     """ Base handler class which controls the code side of each page load.
     Custom pages should inherit from this and override preload and postload.
 
@@ -16,10 +16,8 @@ class PageHandler:
 
     meta = {'renderer': '/page.jade'}
 
-    def __init__(self, page, inferred, get, post):
-        self.page = page
-        self.params = process_params(inferred, get, post)
-        self.is_postback = len(post) > 0
+    def __init__(self, request):
+        self.request = request
 
     def pre_block_process(self):
         """
@@ -29,14 +27,14 @@ class PageHandler:
         return
 
     def block_process(self):
-        if hasattr(self.page.layout, 'items'):
-            for block in self.page.layout.items:
-                if isinstance(block, Form) and self.is_postback:
-                    block.post(self.params)
+        if hasattr(self.request.url.page.layout, 'items'):
+            for block in self.request.url.page.layout.items:
+                if isinstance(block, Form) and self.request.POST:
+                    block.post(self.request)
                 if hasattr(block, 'process'):
-                    block.process(self.params)
+                    block.process(self.request)
                 if hasattr(block, 'populate'):
-                    block.populate(self.params)
+                    block.populate(self.request)
 
     def post_block_process(self):
         """
@@ -47,15 +45,11 @@ class PageHandler:
     def render(self):
         renderer = self.meta.get('renderer')
         args = {}
-        args['page'] = self.page.to_mongo()
+        args['page'] = self.request.url.page.to_mongo()
 
-        if self.page.layout:
-            args['layout'] = self.page.layout.render()
+        if self.request.url.page.layout:
+            args['layout'] = self.request.url.page.layout.render()
         else:
             args['layout'] = ''
 
         return render(renderer, args)
-
-
-def process_params(inferred, get, post):
-    return dict(get.items() + post.items() + inferred.items())

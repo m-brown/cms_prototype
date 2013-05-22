@@ -52,10 +52,10 @@ class MongoEngineForm(Form):
                 o['fields'][pos]['value'] = f.value
         return o
 
-    def populate(self, parameters):
+    def populate(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self.mapfield_to_dict(self.identity, parameters)
+            id = self.mapfield_to_dict(self.identity, request.PARAMS)
         except Exception, e:
             return
         o = MO_class.objects.get(**id)
@@ -64,10 +64,10 @@ class MongoEngineForm(Form):
             if f.type != 'submit':
                 f.value = o[f.name]
 
-    def post(self, parameters):
+    def post(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self.mapfield_to_dict(self.identity, parameters)
+            id = self.mapfield_to_dict(self.identity, request.POST)
             o = MO_class.objects.get(**id)
         except Exception, e:
             if self.type == 'Update':
@@ -77,9 +77,9 @@ class MongoEngineForm(Form):
 
         for field in self.fields:
             if field.type != 'submit':
-                if field.name in parameters:
-                    o[field.name] = parameters[field.name]
-                    field.value = parameters[field.name]
+                if field.name in request.POST:
+                    o[field.name] = request.POST[field.name]
+                    field.value = request.POST[field.name]
                 else:
                     field.value = o[field.name]
 

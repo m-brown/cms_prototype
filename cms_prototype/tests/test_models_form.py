@@ -1,5 +1,6 @@
 from pyramid.httpexceptions import HTTPFound
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
+from pyramid import testing
 
 
 ## FIXME: it appears pyjade doesn't format label tags nicely. Fixing that in pyjade
@@ -51,6 +52,10 @@ TEXT_FROM_WITH_VALUE = """
 
 
 class FormRenderTestCase(TemplateTestCase):
+    def setUp(self):
+        super(FormRenderTestCase, self).setUp()
+        self.request = testing.DummyRequest()
+
     def test_simple_form(self):
         from cms_prototype.models.blocks.form import Form, Input
 
@@ -107,7 +112,9 @@ class FormRenderTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class='cms_prototype.models.blocks.text:HTMLBlock',
                             fields=[Input(name='text')],
                             identity={'textID': 'id'})
-        f.populate({'textID': t.id})
+
+        self.request.PARAMS = {'textID': t.id}
+        f.populate(self.request)
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(strip_html_whitespace(f.render()),
@@ -115,14 +122,18 @@ class FormRenderTestCase(TemplateTestCase):
 
 
 class FormPostTestCase(TemplateTestCase):
+    def setUp(self):
+        super(FormPostTestCase, self).setUp()
+        self.request = testing.DummyRequest()
+
     def test_no_class(self):
         from cms_prototype.models.blocks.form import MongoEngineForm
         f = MongoEngineForm(mongo_object_class='foo:bar')
         f.save()
 
-        post = {}
+        req = {'POST': {}}
         with self.assertRaises(Exception):
-            f.post(post)
+            f.post(req)
 
     def test_no_id(self):
         from cms_prototype.models.blocks.form import MongoEngineForm
@@ -130,9 +141,9 @@ class FormPostTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             type='Update')
         f.save()
-        post = {}
+        req = {'POST': {}}
         with self.assertRaises(Exception):
-            f.post(post)
+            f.post(req)
 
     def test_correct_post(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
@@ -151,8 +162,8 @@ class FormPostTestCase(TemplateTestCase):
                             identity={'id': 'id'})
         f.save()
 
-        post = {'id': l.id, 'href': 'bar', 'text': 'foo'}
-        f.post(post)
+        self.request.POST = {'id': l.id, 'href': 'bar', 'text': 'foo'}
+        f.post(self.request)
 
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "bar")
@@ -172,11 +183,8 @@ class FormPostTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link")
         f.save()
 
-        post = {}
-        post['id'] = l.id
-        post['href'] = 'bar'
-        post['text'] = 'foo'
-        f.post(post)
+        self.request.POST = {'id': l.id, 'href': 'bar', 'text': 'foo'}
+        f.post(self.request)
 
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "foo")
@@ -193,10 +201,9 @@ class FormPostTestCase(TemplateTestCase):
 
         self.assertEqual(Link.objects().count(), 0)
 
-        post = {}
-        post['href'] = 'foo'
-        post['text'] = 'bar'
-        f.post(post)
+        self.request.POST['href'] = 'foo'
+        self.request.POST['text'] = 'bar'
+        f.post(self.request)
 
         self.assertEqual(Link.objects().count(), 1)
         l = Link.objects().first()
@@ -213,8 +220,8 @@ class FormPostTestCase(TemplateTestCase):
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
                             identity={'labelID': 'id'})
-
-        f.post({'labelID': l.id, 'text': 'buz'})
+        self.request.POST = {'labelID': l.id, 'text': 'buz'} 
+        f.post(self.request)
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "foo")
         self.assertEqual(l.text, "buz")
@@ -237,9 +244,9 @@ class FormPostTestCase(TemplateTestCase):
                             next_page='foo')
         f.save()
 
-        post = {'id': l.id, 'href': 'bar', 'text': 'foo'}
+        self.request.POST = {'id': l.id, 'href': 'bar', 'text': 'foo'}
         with self.assertRaises(HTTPFound):
-            f.post(post)
+            f.post(self.request)
 
         l = Link.objects.get(id=l.id)
         self.assertEqual(l.href, "bar")
@@ -247,6 +254,10 @@ class FormPostTestCase(TemplateTestCase):
 
 
 class FormPopulateTestCase(TemplateTestCase):
+    def setUp(self):
+        super(FormPopulateTestCase, self).setUp()
+        self.request = testing.DummyRequest()
+
     def test_get_identifier(self):
         from cms_prototype.models.blocks.form import MongoEngineForm, Input
         from cms_prototype.models.blocks.link import Link
@@ -280,8 +291,8 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity={'labelID': 'id'})
         f.save()
-        p = {'labelID': l.id}
-        f.populate(p)
+        self.request.PARAMS = {'labelID': l.id}
+        f.populate(self.request)
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(f.fields[1].value, 'bar')
@@ -294,7 +305,7 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity={'labelID': 'id'})
 
-        f.populate({})
+        f.populate(self.request)
         with self.assertRaises(AttributeError):
             a = f.fields[0].value
         with self.assertRaises(AttributeError):
@@ -312,8 +323,8 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity={'href': 'href', 'text': 'href'})
         f.save()
-        p = {'href': 'foo', 'text': 'bar'}
-        f.populate(p)
+        self.request.PARAMS = {'href': 'foo', 'text': 'bar'}
+        f.populate(self.request)
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(f.fields[1].value, 'bar')
@@ -330,8 +341,8 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='text', name='text')],
                             identity={'href': 'href', 'text': 'href'})
         f.save()
-        p = {'href': 'foo'}
-        f.populate(p)
+        self.request.PARAMS = {'href': 'foo'}
+        f.populate(self.request)
         with self.assertRaises(AttributeError):
             a = f.fields[0].value
         with self.assertRaises(AttributeError):
@@ -350,8 +361,8 @@ class FormPopulateTestCase(TemplateTestCase):
                                     Input(type='submit', name='save')],
                             identity={'href': 'href', 'text': 'href'})
         f.save()
-        p = {'href': 'foo', 'text': 'bar'}
-        f.populate(p)
+        self.request.PARAMS = {'href': 'foo', 'text': 'bar'}
+        f.populate(self.request)
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(f.fields[1].value, 'bar')
