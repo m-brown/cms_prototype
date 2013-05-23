@@ -1,6 +1,9 @@
+from collections import namedtuple
+from pyramid import testing
 from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 from cms_prototype.models.blocks.block import Block
+from cms_prototype.models.site import Page, Url, UrlKey, Site
 
 
 class MongoEngineTableTest(TemplateTestCase):
@@ -11,10 +14,13 @@ class MongoEngineTableTest(TemplateTestCase):
         self.db.block.remove()
         self.db.versioned_block.remove()
 
+        self.request = testing.DummyRequest()
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
+
     def test_creation_and_population(self):
         t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
-        t.populate({})
+        t.populate(self.request)
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
@@ -22,7 +28,7 @@ class MongoEngineTableTest(TemplateTestCase):
     def test_multiple_rows(self):
         t = MongoEngineTable(database=self.db.name, collection='block')
         t.save()
-        t.populate({})
+        t.populate(self.request)
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
@@ -30,14 +36,14 @@ class MongoEngineTableTest(TemplateTestCase):
         b = Block(name='test')
         b.save()
 
-        t.populate({})
+        t.populate(self.request)
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 2)
 
         b = Block(name='test2')
         b.save()
 
-        t.populate({})
+        t.populate(self.request)
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 3)
 
@@ -46,7 +52,7 @@ class MongoEngineTableTest(TemplateTestCase):
         t.save()
 
         a = MongoEngineTable.objects(id=t.id).first()
-        a.populate({})
+        a.populate(self.request)
 
         html = a.render()
 
@@ -60,7 +66,7 @@ class MongoEngineTableTest(TemplateTestCase):
         t.columns.append(MongoColumn(field='_cls', display='Class'))
         t.save()
 
-        t.populate({})
+        t.populate(self.request)
         html = t.render()
 
         self.assertIn('<table', html)
@@ -88,7 +94,7 @@ class MongoEngineTableTest(TemplateTestCase):
         b1 = Block(name='test1')
         b1.save()
 
-        t.populate({})
+        t.populate(self.request)
         self.assertEqual(len(t.data), 4)
         self.assertEqual(t.data[0]['name'], 'table')
         self.assertEqual(t.data[3]['name'], 'test3')
@@ -96,7 +102,7 @@ class MongoEngineTableTest(TemplateTestCase):
         #test reverse order
         t.sort = {'name': -1}
         t.save()
-        t.populate({})
+        t.populate(self.request)
         self.assertEqual(len(t.data), 4)
         self.assertEqual(t.data[0]['name'], 'test3')
         self.assertEqual(t.data[3]['name'], 'table')
@@ -104,7 +110,8 @@ class MongoEngineTableTest(TemplateTestCase):
     def test_query(self):
         t = MongoEngineTable(database=self.db.name, collection='block', name='table', spec={'name': 'name'})
         t.save()
-        t.populate({'name': 'table'})
+        self.request.PARAMS = {'name': 'table'}
+        t.populate(self.request)
 
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
@@ -112,6 +119,27 @@ class MongoEngineTableTest(TemplateTestCase):
         b = Block(name='test')
         b.save()
 
-        t.populate({'name': 'table'})
+        t.populate(self.request)
         self.assertNotEqual(t.data, None)
         self.assertEqual(len(t.data), 1)
+
+    def test_page_query(self):
+        t = MongoEngineTable(database='cms',
+                    collection='url',
+                    columns=[MongoColumn(field='id.url', display='URL'),
+                            MongoColumn(field='page.$ref', display='Page Type')],
+                    spec={'site': '_id.site'})
+        t.save()
+
+        s = Site(name='foo', unique_name='bar')
+        s.save()
+        p = Page()
+        p.save()
+
+        for x in xrange(1, 10):
+            k = UrlKey(site=s, url=str(x))
+            u = Url(key=k, page=p)
+            u.save()
+
+        self.request.PARAMS = {'site': s.id}
+        t.populate(self.request)

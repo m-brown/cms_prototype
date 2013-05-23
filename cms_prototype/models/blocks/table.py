@@ -23,7 +23,7 @@ class MongoEngineTable(Block):
         args.update(kwargs)
         return super(MongoEngineTable, self).render(**args)
 
-    def populate(self, parameters):
+    def populate(self, request):
         sort = []
         for key, value in self.sort.iteritems():
             sort.append((key, value))
@@ -32,7 +32,7 @@ class MongoEngineTable(Block):
         for col in self.columns:
             fields[col.field] = 1
 
-        spec = self.mapfield_to_dict(self.spec, parameters) if self.spec else {}
+        spec = self.mapfield_to_dict(self.spec, request.PARAMS) if self.spec else {}
         cursor = MongoEngineTable._get_collection().database[self.collection].find(spec, fields=fields, sort=sort)
         self.data = []
         for row in cursor:

@@ -22,6 +22,7 @@ def page(request, editor=False):
     request.cms.site = site
     request.cms.url = url
     request.PARAMS = dict(request.GET.items())#TODO - add infered
+    request.PARAMS['site'] = site.id
 
     if url.page.handler_module:
         mod = __import__(url.page.handler_module, globals(), locals(), [url.page.handler_class], -1)
