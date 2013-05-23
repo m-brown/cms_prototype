@@ -27,9 +27,9 @@ class PageHandler(object):
         return
 
     def block_process(self):
-        if hasattr(self.request.url.page.layout, 'items'):
-            for block in self.request.url.page.layout.items:
-                if isinstance(block, Form) and self.request.POST:
+        if hasattr(self.request.cms.page.layout, 'items'):
+            for block in self.request.cms.page.layout.items:
+                if isinstance(block, Form) and len(self.request.POST) > 0:
                     block.post(self.request)
                 if hasattr(block, 'process'):
                     block.process(self.request)
@@ -45,10 +45,10 @@ class PageHandler(object):
     def render(self):
         renderer = self.meta.get('renderer')
         args = {}
-        args['page'] = self.request.url.page.to_mongo()
+        args['page'] = self.request.cms.page.to_mongo()
 
-        if self.request.url.page.layout:
-            args['layout'] = self.request.url.page.layout.render()
+        if self.request.cms.page.layout:
+            args['layout'] = self.request.cms.page.layout.render()
         else:
             args['layout'] = ''
 

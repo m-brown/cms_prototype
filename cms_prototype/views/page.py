@@ -1,3 +1,4 @@
+from collections import namedtuple
 from cms_prototype.models.site import Site, Url
 from cms_prototype.models.page_handler import PageHandler
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
@@ -16,8 +17,10 @@ def page(request, editor=False):
         raise HTTPNotFound()
 
     #attach bespoke objects to request
-    request.site = site
-    request.url = url
+    request.cms = namedtuple('cms', ['page', 'site', 'url'])
+    request.cms.page = url.page
+    request.cms.site = site
+    request.cms.url = url
     request.PARAMS = dict(request.GET.items())#TODO - add infered
 
     if url.page.handler_module:

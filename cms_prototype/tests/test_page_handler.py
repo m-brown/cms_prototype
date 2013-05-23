@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pyramid import testing
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 from cms_prototype.models.page_handler import PageHandler
@@ -46,12 +47,12 @@ class PreProcessHandler(PageHandler):
     def pre_block_process(self):
         b = HTMLBlock(text='bar')
         b.save()
-        self.request.url.page.layout.items.append(b)
+        self.request.cms.url.page.layout.items.append(b)
 
 
 class PostProcessHandler(PageHandler):
     def post_block_process(self):
-        self.request.url.page.layout.items[0].text = 'bar'
+        self.request.cms.url.page.layout.items[0].text = 'bar'
 
 
 class Handler(TemplateTestCase):
@@ -65,7 +66,9 @@ class Handler(TemplateTestCase):
         self.p.save()
 
         self.request = testing.DummyRequest()
-        self.request.url = Url(page=self.p)
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
+        self.request.cms.page = self.p
+        self.request.cms.url = Url(page=self.p)
 
     def test_non_modified_render(self):
         h = PageHandler(request=self.request)
