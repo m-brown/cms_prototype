@@ -18,7 +18,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
 
     def test_creation_and_population(self):
-        t = MongoEngineTable(database=self.db.name, collection='block')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block')
         t.save()
         t.populate(self.request)
 
@@ -26,7 +26,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(len(t.data), 1)
 
     def test_multiple_rows(self):
-        t = MongoEngineTable(database=self.db.name, collection='block')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block')
         t.save()
         t.populate(self.request)
 
@@ -48,7 +48,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(len(t.data), 3)
 
     def test_render(self):
-        t = MongoEngineTable(database=self.db.name, collection='block')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block')
         t.save()
 
         a = MongoEngineTable.objects(id=t.id).first()
@@ -61,7 +61,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_render_columns(self):
-        t = MongoEngineTable(database=self.db.name, collection='block', name='test table')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block', name='test table')
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.columns.append(MongoColumn(field='_cls', display='Class'))
         t.save()
@@ -75,7 +75,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(html.count('<td>'), 2)
 
     def test_render_nopopulate(self):
-        t = MongoEngineTable(database=self.db.name, collection='block')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block')
         t.save()
 
         html = t.render()
@@ -83,7 +83,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(html.count('<tr>'), 1)
 
     def test_sort(self):
-        t = MongoEngineTable(database=self.db.name, collection='block', name='table', sort={'name': 1})
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block', name='table', sort={'name': 1})
         t.columns.append(MongoColumn(field='name', display='Name'))
         t.save()
 
@@ -108,7 +108,7 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(t.data[3]['name'], 'table')
 
     def test_query(self):
-        t = MongoEngineTable(database=self.db.name, collection='block', name='table', spec={'name': 'name'})
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block', name='table', spec={'name': 'name'})
         t.save()
         self.request.PARAMS = {'name': 'table'}
         t.populate(self.request)
@@ -125,10 +125,10 @@ class MongoEngineTableTest(TemplateTestCase):
 
     def test_page_query(self):
         t = MongoEngineTable(database='cms',
-                    collection='url',
-                    columns=[MongoColumn(field='id.url', display='URL'),
-                            MongoColumn(field='page.$ref', display='Page Type')],
-                    spec={'site': '_id.site'})
+                    mongoengine_class='cms_prototype.models.site:Url',
+                    columns=[MongoColumn(field='_id.url', display='URL'),
+                            MongoColumn(field='page', display='Page Type')],
+                    spec={'site': 'key.site'})
         t.save()
 
         s = Site(name='foo', unique_name='bar')

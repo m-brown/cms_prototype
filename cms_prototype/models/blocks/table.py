@@ -8,8 +8,7 @@ class MongoColumn(EmbeddedDocument):
 
 
 class MongoEngineTable(Block):
-    database = StringField(required=True)
-    collection = StringField(required=True)
+    mongoengine_class = StringField(required=True)
     columns = ListField(EmbeddedDocumentField(MongoColumn))
     spec = MapField(field=StringField())
     sort = DictField()
@@ -26,19 +25,21 @@ class MongoEngineTable(Block):
     def populate(self, request):
         sort = []
         for key, value in self.sort.iteritems():
-            sort.append((key, value))
-
+            sort.append(('-' if value < 0 else '') + key)
+        print sort
         fields = {}
         for col in self.columns:
             fields[col.field] = 1
 
+        mod, cls = self.mongoengine_class.split(':')
+        mod = __import__(mod, globals(), locals(), [cls], -1)
+        cls = getattr(mod, cls)
+
         spec = self.mapfield_to_dict(self.spec, request.PARAMS) if self.spec else {}
-        cursor = MongoEngineTable._get_collection().database[self.collection].find(spec, fields=fields, sort=sort)
+        objs = cls.objects(**spec).order_by(*sort)
         self.data = []
-        for row in cursor:
+        for row in objs:
             r = {}
             for col in self.columns:
-                if not col.field in row:
-                    raise AttributeError('The row has not attribute "' + col.field + '"')
-                r[col.field] = row[col.field]
+                r[col.field] = Block.get_dotted_value_from_object(row, col.field)
             self.data.append(r)
