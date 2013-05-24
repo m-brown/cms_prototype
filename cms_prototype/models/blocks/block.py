@@ -33,3 +33,12 @@ class Block(VersionedDocument):
                 raise Exception('Cannot populate dict: missing parameter - %s' % f)
             d[mapfield[f]] = parameters[f]
         return d
+
+    @staticmethod
+    def get_dotted_value_from_object(obj, val):
+        parts = val.split('.')
+        obj = getattr(obj, parts[0])
+        if len(parts) == 1:
+            return obj
+        else:
+            return Block.get_dotted_value_from_object(obj, val[val.index('.') + 1:])
