@@ -8,6 +8,7 @@ from cms_prototype.models.layout import Layout
 
 
 class Page(VersionedDocument):
+    name           = StringField(required=True)
     handler_module = StringField()
     handler_class  = StringField()
     parameters     = DictField()

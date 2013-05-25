@@ -47,12 +47,12 @@ class PreProcessHandler(PageHandler):
     def pre_block_process(self):
         b = HTMLBlock(text='bar')
         b.save()
-        self.request.cms.url.page.layout.items.append(b)
+        self.request.cms.page.layout.items.append(b)
 
 
 class PostProcessHandler(PageHandler):
     def post_block_process(self):
-        self.request.cms.url.page.layout.items[0].text = 'bar'
+        self.request.cms.page.layout.items[0].text = 'bar'
 
 
 class Handler(TemplateTestCase):
@@ -62,7 +62,7 @@ class Handler(TemplateTestCase):
         b.save()
         l = Layout()
         l.items.append(b)
-        self.p = Page(layout=l)
+        self.p = Page(name='test', layout=l)
         self.p.save()
 
         self.request = testing.DummyRequest()

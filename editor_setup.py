@@ -53,9 +53,9 @@ url.save()
 
 #pages
 t = MongoEngineTable(mongoengine_class='cms_prototype.models.site:Url',
-                    columns=[MongoColumn(field='id.url', display='URL'),
-                            MongoColumn(field='page.id', display='Page Type')],
-                    spec={'site': '_id.site'})
+                    columns=[MongoColumn(field='url', display='URL'),
+                            MongoColumn(field='page.name', display='Page Type')],
+                    spec={'site': 'site'})
 t.save()
 
 l = Layout()

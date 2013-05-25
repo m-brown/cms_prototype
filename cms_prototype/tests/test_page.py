@@ -13,7 +13,7 @@ class PageloadTest(TestCase):
 
         site = Site(name='test', unique_name='test')
         site.save()
-        page = Page()
+        page = Page(name='test')
         page.save()
         url = Url(site=site, url='index.html', page=page)
         url.save()
@@ -58,7 +58,7 @@ class PageHandlerLoadTest(TestCase):
 
         site = Site(name='test', unique_name='test')
         site.save()
-        page = Page(handler_module='cms_prototype.tests.test_page', handler_class='DummyHandler')
+        page = Page(name='test', handler_module='cms_prototype.tests.test_page', handler_class='DummyHandler')
         page.save()
         url = Url(site=site, url='index.html', page=page)
         url.save()

@@ -40,7 +40,7 @@ def page(request, editor=False):
 @view_config(route_name='editor')
 def editor(request):
     site = Site.objects(unique_name='_editor').first()
-    url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
+    url = Url.objects(site=site.id, url=request.matchdict.get('url', '')).first()
 
     if not url:
         return page(request, True)

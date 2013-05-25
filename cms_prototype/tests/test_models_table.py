@@ -133,7 +133,7 @@ class MongoEngineTableTest(TemplateTestCase):
 
         s = Site(name='foo', unique_name='bar')
         s.save()
-        p = Page()
+        p = Page(name='test')
         p.save()
 
         for x in xrange(1, 10):
