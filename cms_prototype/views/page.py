@@ -12,7 +12,7 @@ def page(request, editor=False):
     if not site:
         raise HTTPFound(location='/%s/_editor/notfound' % request.matchdict['site_unique_name'])
 
-    url = Url.objects(key__site=site.id, key__url=request.matchdict.get('url', '')).first()
+    url = Url.objects(site=site.id, url=request.matchdict.get('url', '')).first()
     if not url:
         raise HTTPNotFound()
 

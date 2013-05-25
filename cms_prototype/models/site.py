@@ -22,11 +22,7 @@ class Site(VersionedDocument):
     footer         = ReferenceField('Block', dbref=True)
 
 
-class UrlKey(EmbeddedDocument):
-    site           = ReferenceField('Site', dbref=False)
-    url            = StringField()
-
-
 class Url(VersionedDocument):
-    key            = EmbeddedDocumentField('UrlKey', primary_key=True)
-    page           = ReferenceField('Page', dbref=False)
+    url            = StringField(required=True, unique_with=('site'))
+    site           = ReferenceField('Site', dbref=False, required=True)
+    page           = ReferenceField('Page', dbref=False, required=True)

@@ -1,7 +1,7 @@
 import os
 from mongoengine import connect
 
-from cms_prototype.models.site import Site, Page, Url, UrlKey
+from cms_prototype.models.site import Site, Page, Url
 from cms_prototype.models.site import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
@@ -30,8 +30,7 @@ l.items.append(link)
 p = Page(name='Site not found', layout=l)
 p.save()
 
-k = UrlKey(site=s, url='notfound')
-url = Url(key=k, page=p)
+url = Url(site=s, url='notfound', page=p)
 url.save()
 
 
@@ -48,16 +47,14 @@ l.items.append(f)
 p = Page(name='Create Site', layout=l)
 p.save()
 
-k = UrlKey(site=s, url='create')
-url = Url(key=k, page=p)
+url = Url(site=s, url='create', page=p)
 url.save()
 
 
 #pages
-t = MongoEngineTable(database='cms',
-                    collection='url',
+t = MongoEngineTable(mongoengine_class='cms_prototype.models.site:Url',
                     columns=[MongoColumn(field='id.url', display='URL'),
-                            MongoColumn(field='page.$ref', display='Page Type')],
+                            MongoColumn(field='page.id', display='Page Type')],
                     spec={'site': '_id.site'})
 t.save()
 
@@ -66,5 +63,5 @@ l.items.append(t)
 p = Page(name='URL List', layout=l)
 p.save()
 
-url = Url(key=UrlKey(site=s, url='pages'), page=p)
+url = Url(site=s, url='pages', page=p)
 url.save()

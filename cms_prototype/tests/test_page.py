@@ -2,7 +2,7 @@ from pyramid import testing
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from cms_prototype.tests.common import TestCase
-from cms_prototype.models.site import Site, Page, UrlKey, Url
+from cms_prototype.models.site import Site, Page, Url
 from cms_prototype.models.page_handler import PageHandler
 
 
@@ -15,8 +15,7 @@ class PageloadTest(TestCase):
         site.save()
         page = Page()
         page.save()
-        urlKey = UrlKey(site=site, url='index.html')
-        url = Url(key=urlKey, page=page)
+        url = Url(site=site, url='index.html', page=page)
         url.save()
 
         from cms_prototype import main
@@ -61,8 +60,7 @@ class PageHandlerLoadTest(TestCase):
         site.save()
         page = Page(handler_module='cms_prototype.tests.test_page', handler_class='DummyHandler')
         page.save()
-        urlKey = UrlKey(site=site, url='index.html')
-        url = Url(key=urlKey, page=page)
+        url = Url(site=site, url='index.html', page=page)
         url.save()
 
         from cms_prototype import main

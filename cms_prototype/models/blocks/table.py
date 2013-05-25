@@ -26,7 +26,7 @@ class MongoEngineTable(Block):
         sort = []
         for key, value in self.sort.iteritems():
             sort.append(('-' if value < 0 else '') + key)
-        print sort
+
         fields = {}
         for col in self.columns:
             fields[col.field] = 1
@@ -36,6 +36,7 @@ class MongoEngineTable(Block):
         cls = getattr(mod, cls)
 
         spec = self.mapfield_to_dict(self.spec, request.PARAMS) if self.spec else {}
+
         objs = cls.objects(**spec).order_by(*sort)
         self.data = []
         for row in objs:

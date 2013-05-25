@@ -39,7 +39,7 @@ class BlockViewTest(TemplateTestCase):
     def test_table_block(self):
         from cms_prototype.views.block import block
 
-        t = MongoEngineTable(database=self.db.name, collection='block', name='test table')
+        t = MongoEngineTable(mongoengine_class='cms_prototype.models.blocks.block:Block', name='test table')
         t.columns.append(MongoColumn(field='name'))
         t.save()
 

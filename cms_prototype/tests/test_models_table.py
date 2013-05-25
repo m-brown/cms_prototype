@@ -3,7 +3,7 @@ from pyramid import testing
 from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 from cms_prototype.models.blocks.block import Block
-from cms_prototype.models.site import Page, Url, UrlKey, Site
+from cms_prototype.models.site import Page, Url, Site
 
 
 class MongoEngineTableTest(TemplateTestCase):
@@ -126,9 +126,9 @@ class MongoEngineTableTest(TemplateTestCase):
     def test_page_query(self):
         t = MongoEngineTable(database='cms',
                     mongoengine_class='cms_prototype.models.site:Url',
-                    columns=[MongoColumn(field='_id.url', display='URL'),
+                    columns=[MongoColumn(field='url', display='URL'),
                             MongoColumn(field='page', display='Page Type')],
-                    spec={'site': 'key.site'})
+                    spec={'site': 'site'})
         t.save()
 
         s = Site(name='foo', unique_name='bar')
@@ -137,8 +137,7 @@ class MongoEngineTableTest(TemplateTestCase):
         p.save()
 
         for x in xrange(1, 10):
-            k = UrlKey(site=s, url=str(x))
-            u = Url(key=k, page=p)
+            u = Url(site=s, url=str(x), page=p)
             u.save()
 
         self.request.PARAMS = {'site': s.id}
