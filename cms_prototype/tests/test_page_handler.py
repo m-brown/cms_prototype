@@ -7,7 +7,7 @@ from cms_prototype.models.layout import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 
 
-WRAPPER = """
+WRAPPER_OPEN = """
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -16,31 +16,33 @@ WRAPPER = """
         <script src="/static/bootstrap/js/bootstrap.js"></script>
     </head>
     <body>
+    <div class="container">
 """
-NON_MOD_HTML = WRAPPER + """
-        <div class="layout">
-            <div class="block">foo</div>
+
+WRAPPER_CLOSE = """
         </div>
     </body>
 </html>
 """
 
-PRE_MOD_HTML = WRAPPER + """
+NON_MOD_HTML = WRAPPER_OPEN + """
+        <div class="layout">
+            <div class="block">foo</div>
+        </div>
+""" + WRAPPER_CLOSE
+
+PRE_MOD_HTML = WRAPPER_OPEN + """
         <div class="layout">
             <div class="block">foo</div>
             <div class="block">bar</div>
         </div>
-    </body>
-</html>
-"""
+""" + WRAPPER_CLOSE
 
-POST_MOD_HTML = WRAPPER + """
+POST_MOD_HTML = WRAPPER_OPEN + """
         <div class="layout">
             <div class="block">bar</div>
         </div>
-    </body>
-</html>
-"""
+""" + WRAPPER_CLOSE
 
 
 class PreProcessHandler(PageHandler):
