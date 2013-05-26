@@ -36,10 +36,10 @@ url.save()
 
 #create new site
 f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Site',
-                    identity={'unique_name': 'unique_name'},
+                    identity={'unique_name': 'cms.site.unique_name'},
                     next_page='pages')
 f.fields.append(Input(name='name', label='Name'))
-f.fields.append(Input(name='unique_name', label='Unique Name'))
+f.fields.append(Input(name='unique_name', label='Unique Name', default='actual_site_unique_name'))
 f.fields.append(Input(name='submit', type='submit', html_class='btn'))
 f.save()
 l = Layout()
@@ -53,9 +53,9 @@ url.save()
 
 #pages
 t = MongoEngineTable(mongoengine_class='cms_prototype.models.site:Url',
-                    columns=[MongoColumn(field='url', display='URL'),
-                            MongoColumn(field='page.name', display='Page Type')],
-                    spec={'site': 'site'})
+                     columns=[MongoColumn(field='url', display='URL'),
+                              MongoColumn(field='page.name', display='Page Type')],
+                     spec={'site': 'cms.site.id'})
 t.save()
 
 l = Layout()

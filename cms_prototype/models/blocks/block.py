@@ -24,13 +24,14 @@ class Block(VersionedDocument):
 
         return render(renderer, args)
 
-    def mapfield_to_dict(self, mapfield, parameters):
+    @staticmethod
+    def mapfield_to_dict(mapfield, parameters):
         if not mapfield or len(mapfield) == 0:
-            raise Exception('Cannot populate dict: no mapfield was given')
+            raise MissingParameter('Cannot populate dict: no mapfield was given')
         d = {}
         for f in mapfield:
             if not f in parameters:
-                raise Exception('Cannot populate dict: missing parameter - %s' % f)
+                raise MissingParameter('Cannot populate dict: missing parameter - %s' % f)
             d[mapfield[f]] = parameters[f]
         return d
 
@@ -42,3 +43,7 @@ class Block(VersionedDocument):
             return obj
         else:
             return Block.get_dotted_value_from_object(obj, val[val.index('.') + 1:])
+
+
+class MissingParameter(Exception):
+    pass

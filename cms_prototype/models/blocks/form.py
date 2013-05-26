@@ -1,15 +1,17 @@
 from pyramid.httpexceptions import HTTPFound
 from mongoengine import BooleanField, IntField, ListField, StringField, MapField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
-from cms_prototype.models.blocks.block import Block
+from cms_prototype.models.blocks.block import Block, MissingParameter
 
 
 class Input(EmbeddedDocument):
+    name = StringField(required=True)
+    type = StringField(required=True, default='text')
+    label = StringField()
+    default = StringField()
+
     html_id = StringField()
     html_class = StringField()
-    type = StringField(required=True, default='text')
-    name = StringField(required=True)
-    label = StringField()
 
     meta = {'allow_inheritance': True}
 
@@ -55,19 +57,26 @@ class MongoEngineForm(Form):
     def populate(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self.mapfield_to_dict(self.identity, request.PARAMS)
-        except Exception, e:
-            return
-        o = MO_class.objects.get(**id)
+            id = Block.mapfield_to_dict(self.identity, request.PARAMS)
+            o = MO_class.objects.get(**id)
 
-        for f in self.fields:
-            if f.type != 'submit':
-                f.value = o[f.name]
+            for f in self.fields:
+                if f.type != 'submit':
+                    f.value = o[f.name]
+        except MissingParameter, e:
+            for f in self.fields:
+                if f.type != 'submit' and f.default:
+                    if f.default.startswith('cms'):
+                        v = Block.get_dotted_value_from_object(request, f.default)
+                    else:
+                        v = request.PARAMS[f.default]
+                    if v:
+                        f.value = v
 
     def post(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = self.mapfield_to_dict(self.identity, request.POST)
+            id = Block.mapfield_to_dict(self.identity, request.POST)
             o = MO_class.objects.get(**id)
         except Exception, e:
             if self.type == 'Update':

@@ -71,6 +71,7 @@ class Handler(TemplateTestCase):
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
         self.request.cms.page = self.p
         self.request.cms.url = Url(page=self.p)
+        self.request.PARAMS = {}
 
     def test_non_modified_render(self):
         h = PageHandler(request=self.request)
