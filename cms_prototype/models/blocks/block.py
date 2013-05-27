@@ -25,14 +25,17 @@ class Block(VersionedDocument):
         return render(renderer, args)
 
     @staticmethod
-    def mapfield_to_dict(mapfield, parameters):
+    def mapfield_to_dict(mapfield, parameters, cms=None):
         if not mapfield or len(mapfield) == 0:
             raise MissingParameter('Cannot populate dict: no mapfield was given')
         d = {}
         for f in mapfield:
-            if not f in parameters:
+            if mapfield[f].startswith('cms'):
+                d[f] = Block.get_dotted_value_from_object(cms, mapfield[f][4:])
+            elif not mapfield[f] in parameters:
                 raise MissingParameter('Cannot populate dict: missing parameter - %s' % f)
-            d[mapfield[f]] = parameters[f]
+            else:
+                d[f] = parameters[mapfield[f]]
         return d
 
     @staticmethod
@@ -43,6 +46,13 @@ class Block(VersionedDocument):
             return obj
         else:
             return Block.get_dotted_value_from_object(obj, val[val.index('.') + 1:])
+
+    @staticmethod
+    def get_value(request, val):
+        if val.startswith('cms'):
+            return Block.get_dotted_value_from_object(request, val)
+        else:
+            return request.PARAMS.get(val, '')
 
 
 class MissingParameter(Exception):

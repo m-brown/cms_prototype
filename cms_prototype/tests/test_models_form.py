@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pyramid.httpexceptions import HTTPFound
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm
@@ -59,6 +60,7 @@ class FormRenderTestCase(TemplateTestCase):
         super(FormRenderTestCase, self).setUp()
         self.request = testing.DummyRequest()
         self.request.PARAMS = {}
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
 
     def test_simple_form(self):
         form_a = Form()
@@ -106,7 +108,7 @@ class FormRenderTestCase(TemplateTestCase):
 
         f = MongoEngineForm(mongo_object_class='cms_prototype.models.blocks.text:HTMLBlock',
                             fields=[Input(name='text')],
-                            identity={'textID': 'id'})
+                            identity={'id': 'textID'})
 
         self.request.PARAMS = {'textID': t.id}
         f.populate(self.request)
@@ -121,6 +123,7 @@ class FormPostTestCase(TemplateTestCase):
         super(FormPostTestCase, self).setUp()
         self.request = testing.DummyRequest()
         self.request.PARAMS = {}
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
 
     def test_no_class(self):
         f = MongoEngineForm(mongo_object_class='foo:bar')
@@ -201,7 +204,7 @@ class FormPostTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'labelID': 'id'})
+                            identity={'id': 'labelID'})
         self.request.POST = {'labelID': l.id, 'text': 'buz'}
         f.post(self.request)
         l = Link.objects.get(id=l.id)
@@ -237,25 +240,14 @@ class FormPopulateTestCase(TemplateTestCase):
     def setUp(self):
         super(FormPopulateTestCase, self).setUp()
         self.request = testing.DummyRequest()
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
         self.request.PARAMS = {}
 
     def test_get_identifier(self):
-        l = Link(href="foo", text="bar")
-        l.save()
+        from cms_prototype.models.blocks.block import Block
 
-        ident = {'labelID': 'id'}
-        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
-                            fields=[Input(type='text', name='href'),
-                                    Input(type='text', name='text')],
-                            identity=ident)
-        self.assertDictEqual(f.mapfield_to_dict(ident, {'labelID': l.id}), {'id': l.id})
-
-        ident = {'href': 'href', 'text': 'text'}
-        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
-                            fields=[Input(type='text', name='href'),
-                                    Input(type='text', name='text')],
-                            identity=ident)
-        self.assertDictEqual(f.mapfield_to_dict(ident, {'href': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
+        ident = {'href': 'x', 'text': 'text'}
+        self.assertDictEqual(Block.mapfield_to_dict(ident, {'x': 'foo', 'text': 'bar'}), {'href': 'foo', 'text': 'bar'})
 
     def test_populate(self):
         l = Link(href="foo", text="bar")
@@ -264,7 +256,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'labelID': 'id'})
+                            identity={'id': 'labelID'})
         f.save()
         self.request.PARAMS = {'labelID': l.id}
         f.populate(self.request)
@@ -276,7 +268,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'labelID': 'id'})
+                            identity={'id': 'labelID'})
 
         f.populate(self.request)
         with self.assertRaises(AttributeError):
@@ -291,7 +283,7 @@ class FormPopulateTestCase(TemplateTestCase):
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text')],
-                            identity={'href': 'href', 'text': 'href'})
+                            identity={'href': 'href', 'text': 'text'})
         f.save()
         self.request.PARAMS = {'href': 'foo', 'text': 'bar'}
         f.populate(self.request)
@@ -323,7 +315,7 @@ class FormPopulateTestCase(TemplateTestCase):
                             fields=[Input(type='text', name='href'),
                                     Input(type='text', name='text'),
                                     Input(type='submit', name='save')],
-                            identity={'href': 'href', 'text': 'href'})
+                            identity={'href': 'href', 'text': 'text'})
         f.save()
         self.request.PARAMS = {'href': 'foo', 'text': 'bar'}
         f.populate(self.request)
@@ -357,7 +349,7 @@ class FormPopulateTestCase(TemplateTestCase):
                             identity={'href': 'href', 'text': 'href'})
 
         f.save()
-        f.populate(request.PARAMS)
+        f.populate(self.request)
 
         with self.assertRaises(AttributeError):
             a = f.fields[0].value

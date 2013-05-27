@@ -35,7 +35,7 @@ class MongoEngineTable(Block):
         mod = __import__(mod, globals(), locals(), [cls], -1)
         cls = getattr(mod, cls)
 
-        spec = self.mapfield_to_dict(self.spec, request.PARAMS) if self.spec else {}
+        spec = Block.mapfield_to_dict(self.spec, request.PARAMS, request.cms) if self.spec else {}
 
         objs = cls.objects(**spec).order_by(*sort)
         self.data = []

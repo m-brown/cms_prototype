@@ -1,6 +1,7 @@
 from pyramid.httpexceptions import HTTPFound
 from mongoengine import BooleanField, IntField, ListField, StringField, MapField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
+from mongoengine.queryset import DoesNotExist
 from cms_prototype.models.blocks.block import Block, MissingParameter
 
 
@@ -57,26 +58,25 @@ class MongoEngineForm(Form):
     def populate(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = Block.mapfield_to_dict(self.identity, request.PARAMS)
+            id = Block.mapfield_to_dict(self.identity, request.PARAMS, request.cms)
             o = MO_class.objects.get(**id)
 
             for f in self.fields:
                 if f.type != 'submit':
                     f.value = o[f.name]
+        except DoesNotExist:
+            return
         except MissingParameter, e:
             for f in self.fields:
                 if f.type != 'submit' and f.default:
-                    if f.default.startswith('cms'):
-                        v = Block.get_dotted_value_from_object(request, f.default)
-                    else:
-                        v = request.PARAMS.get(f.default, '')
+                    v = Block.get_value(request, f.default)
                     if v:
                         f.value = v
 
     def post(self, request):
         MO_class = self._get_mongoengine_class()
         try:
-            id = Block.mapfield_to_dict(self.identity, request.POST)
+            id = Block.mapfield_to_dict(self.identity, request.POST, request.cms)
             o = MO_class.objects.get(**id)
         except Exception, e:
             if self.type == 'Update':

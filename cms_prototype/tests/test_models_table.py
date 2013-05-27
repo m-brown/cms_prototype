@@ -124,17 +124,19 @@ class MongoEngineTableTest(TemplateTestCase):
         self.assertEqual(len(t.data), 1)
 
     def test_page_query(self):
-        t = MongoEngineTable(database='cms',
+        t = MongoEngineTable(
+                    database='cms',
                     mongoengine_class='cms_prototype.models.site:Url',
                     columns=[MongoColumn(field='url', display='URL'),
                             MongoColumn(field='page', display='Page Type')],
-                    spec={'site': 'site'})
+                    spec={'site': 'cms.site.id'})
         t.save()
 
         s = Site(name='foo', unique_name='bar')
         s.save()
         p = Page(name='test')
         p.save()
+        self.request.cms.site = s
 
         for x in xrange(1, 10):
             u = Url(site=s, url=str(x), page=p)
