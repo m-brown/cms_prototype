@@ -350,3 +350,14 @@ class FormPopulateTestCase(TemplateTestCase):
 
         self.assertEqual(f.fields[0].value, 'foo')
         self.assertEqual(f.fields[1].value, 'bar')
+
+    def test_populate_with_missing_param(self):
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.blocks.link:Link",
+                            fields=[Input(type='text', name='href')],
+                            identity={'href': 'href', 'text': 'href'})
+
+        f.save()
+        f.populate(request.PARAMS)
+
+        with self.assertRaises(AttributeError):
+            a = f.fields[0].value

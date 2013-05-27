@@ -69,7 +69,7 @@ class MongoEngineForm(Form):
                     if f.default.startswith('cms'):
                         v = Block.get_dotted_value_from_object(request, f.default)
                     else:
-                        v = request.PARAMS[f.default]
+                        v = request.PARAMS.get(f.default, '')
                     if v:
                         f.value = v
 
