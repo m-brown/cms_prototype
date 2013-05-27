@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from cms_prototype.tests.common import TestCase
 from cms_prototype.models.site import Site, Page, Url
 from cms_prototype.models.page_handler import PageHandler
+from cms_prototype.views.page import page
 
 
 class PageloadTest(TestCase):
@@ -22,27 +23,44 @@ class PageloadTest(TestCase):
         app = main()
 
     def test_missing_project(self):
-        from cms_prototype.views.page import page
-
         request = testing.DummyRequest(matchdict={'site_unique_name': 'somerandomprojectthatdoesnotexist'})
         try:
             page(request)
         except HTTPFound as redirect:
-            self.assertEquals(redirect.location, '/somerandomprojectthatdoesnotexist/_editor/notfound')
+            self.assertEquals(redirect.location, '/somerandomprojectthatdoesnotexist/_editor/notfound?site_unique_name=somerandomprojectthatdoesnotexist')
         else:
             self.fail()
 
     def test_missing_page(self):
-        from cms_prototype.views.page import page
         request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'somerandompagethatdoesnotexist.html'})
 
         with self.assertRaises(HTTPNotFound):
             page(request)
 
+    def test_missing_page_in_editor(self):
+        from cms_prototype.views.page import editor
+        request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'somerandompagethatdoesnotexist.html'})
+
+        site = Site(name='editor', unique_name='_editor')
+        site.save()
+
+        try:
+            editor(request)
+        except HTTPFound as redirect:
+            self.assertEquals(redirect.location, '/test/_editor/page?url=somerandompagethatdoesnotexist.html')
+        else:
+            self.fail()
+
     def test_page_load(self):
-        from cms_prototype.views.page import page
         request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'index.html'})
         response = page(request)
+
+        self.assertEquals(response.status_code, 200)
+
+    def test_page_load_just_site(self):
+        from cms_prototype.views.page import site_nopage
+        request = testing.DummyRequest(matchdict={'site_unique_name': 'test'})
+        response = site_nopage(request)
 
         self.assertEquals(response.status_code, 200)
 
@@ -67,7 +85,6 @@ class PageHandlerLoadTest(TestCase):
         app = main()
 
     def test_handler_view(self):
-        from cms_prototype.views.page import page
         request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'index.html'})
         response = page(request)
 

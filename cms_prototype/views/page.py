@@ -10,9 +10,11 @@ from pyramid.view import view_config
 def page(request, editor=False):
     site = Site.objects(unique_name=request.matchdict['site_unique_name']).first()
     if not site:
-        raise HTTPFound(location='/%s/_editor/notfound' % request.matchdict['site_unique_name'])
+        raise HTTPFound(location='/%s/_editor/notfound?site_unique_name=%s' % (request.matchdict['site_unique_name'], request.matchdict['site_unique_name']))
 
     url = Url.objects(site=site.id, url=request.matchdict.get('url', '')).first()
+    if editor and not url:
+        raise HTTPFound(location='/%s/_editor/page?url=%s' % (request.matchdict['site_unique_name'], request.matchdict['url']))
     if not url:
         raise HTTPNotFound()
 
@@ -47,3 +49,9 @@ def editor(request):
     else:
         request.matchdict['site_unique_name'] = '_editor'
         return page(request, False)
+
+
+@view_config(route_name='site_nopage')
+def site_nopage(request, editor=False):
+    request.matchdict['url'] = 'index.html'
+    return page(request, editor)
