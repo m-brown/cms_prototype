@@ -353,3 +353,14 @@ class FormPopulateTestCase(TemplateTestCase):
 
         with self.assertRaises(AttributeError):
             a = f.fields[0].value
+
+    def test_populate_with_missing_internal_param(self):
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.site:Url",
+                            fields=[Input(type='text', name='site')],
+                            identity={'site': 'request.cms.site.id'})
+        f.save()
+
+        self.request.cms.site = None
+        f.populate(self.request)
+        with self.assertRaises(AttributeError):
+            a = f.fields[0].value

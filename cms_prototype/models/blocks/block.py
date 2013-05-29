@@ -42,6 +42,8 @@ class Block(VersionedDocument):
     def get_dotted_value_from_object(obj, val):
         parts = val.split('.')
         obj = getattr(obj, parts[0])
+        if not obj:
+            raise MissingParameter()
         if len(parts) == 1:
             return obj
         else:
