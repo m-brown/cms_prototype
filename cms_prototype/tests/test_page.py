@@ -1,13 +1,13 @@
 from pyramid import testing
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
-from cms_prototype.tests.common import TestCase
+from cms_prototype.tests.common import TemplateTestCase
 from cms_prototype.models.site import Site, Page, Url
 from cms_prototype.models.page_handler import PageHandler
 from cms_prototype.views.page import page
 
 
-class PageloadTest(TestCase):
+class PageloadTest(TemplateTestCase):
 
     def setUp(self):
         super(PageloadTest, self).setUp()
@@ -64,13 +64,33 @@ class PageloadTest(TestCase):
 
         self.assertEquals(response.status_code, 200)
 
+    def test_page_editor_still_knows_site(self):
+        from cms_prototype.views.page import editor
+        site = Site(name='editor', unique_name='_editor')
+        site.save()
+
+        request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'index.html'})
+
+        response = editor(request)
+        self.assertEquals(request.cms.site.unique_name, 'test')
+
+        request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'edtest'})
+        
+        page = Page(name='foo')
+        page.save()
+        url = Url(site=site, page=page, url='edtest')
+        url.save()
+
+        response = editor(request)
+        self.assertEquals(request.cms.site.unique_name, 'test')
+
 
 class DummyHandler(PageHandler):
     def pre_block_process(self):
         return
 
 
-class PageHandlerLoadTest(TestCase):
+class PageHandlerLoadTest(TemplateTestCase):
     def setUp(self):
         super(PageHandlerLoadTest, self).setUp()
 
