@@ -75,7 +75,7 @@ f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Url',
                             Input(name='page', label='Page Type')])
 f.save()
 l = Layout()
-l.items.append(t)
+l.items.append(f)
 p = Page(name='Create URL', layout=l)
 p.save()
 
