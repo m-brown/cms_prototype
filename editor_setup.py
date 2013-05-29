@@ -65,3 +65,19 @@ p.save()
 
 url = Url(site=s, url='pages', page=p)
 url.save()
+
+
+#create url page
+f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Url',
+                    identity={'site': 'cms.site.id', 'url': 'url'},
+                    next_page='pages',
+                    fields=[Input(name='url', label='URL'),
+                            Input(name='page', label='Page Type')])
+f.save()
+l = Layout()
+l.items.append(t)
+p = Page(name='Create URL', layout=l)
+p.save()
+
+url = Url(site=s, url='createurl', page=p)
+url.save()
