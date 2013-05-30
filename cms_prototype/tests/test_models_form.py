@@ -1,7 +1,7 @@
 from collections import namedtuple
 from pyramid.httpexceptions import HTTPFound
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
-from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm
+from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm, Selection
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
 from pyramid import testing
@@ -118,9 +118,9 @@ class FormRenderTestCase(TemplateTestCase):
                          strip_html_whitespace(TEXT_FROM_WITH_VALUE))
 
 
-class FormPostTestCase(TemplateTestCase):
+class Post(TemplateTestCase):
     def setUp(self):
-        super(FormPostTestCase, self).setUp()
+        super(Post, self).setUp()
         self.request = testing.DummyRequest()
         self.request.PARAMS = {}
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
@@ -236,9 +236,9 @@ class FormPostTestCase(TemplateTestCase):
         self.assertEqual(l.text, "foo")
 
 
-class FormPopulateTestCase(TemplateTestCase):
+class Populate(TemplateTestCase):
     def setUp(self):
-        super(FormPopulateTestCase, self).setUp()
+        super(Populate, self).setUp()
         self.request = testing.DummyRequest()
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
         self.request.PARAMS = {}
@@ -364,3 +364,32 @@ class FormPopulateTestCase(TemplateTestCase):
         f.populate(self.request)
         with self.assertRaises(AttributeError):
             a = f.fields[0].value
+
+class Inputs(TemplateTestCase):
+    def setUp(self):
+        super(Inputs, self).setUp()
+        self.request = testing.DummyRequest()
+        self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
+        self.request.PARAMS = {}
+
+    def test_populate_input_selection(self):
+        from cms_prototype.models.site import Page
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.site:Url",
+                            fields=[Selection(type='selection', name='page', name_field='name', value_field='id')],
+                            identity={'site': 'request.cms.site.id'})
+        f.save()
+
+        f.populate(self.request)
+        with self.assertRaises(AttributeError):
+            a = f.fields[0].options
+
+        f = MongoEngineForm.objects(id=f.id).first()
+
+        p = Page(name='test')
+        p.save()
+
+        f.populate(self.request)
+
+        self.assertEqual(len(f.fields[0].options), 1)
+        self.assertEqual(f.fields[0].options[0].value, p.id)
+        self.assertEqual(f.fields[0].options[0].name, p.name)

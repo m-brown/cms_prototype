@@ -18,12 +18,21 @@ class Input(EmbeddedDocument):
 
 
 class Checkbox(Input):
-
     def __init__(self, *args, **kwargs):
         kwargs['type'] = 'checkbox'
         super(Checkbox, self).__init__(*args, **kwargs)
 
     checked = BooleanField(default=False)
+
+
+class Selection(Input):
+    def __init__(self, *args, **kwargs):
+        kwargs['type'] = 'selection'
+        super(Selection, self).__init__(*args, **kwargs)
+
+    name_field = StringField(required=True)
+    value_field = StringField(required=True)
+    sort_by = StringField()
 
 
 class Form(Block):
@@ -57,6 +66,15 @@ class MongoEngineForm(Form):
 
     def populate(self, request):
         MO_class = self._get_mongoengine_class()
+
+        #process any fields first as we need to which values are acceptable
+        for field in self.fields:
+            print field.name
+            print isinstance(field, Selection)
+            if isinstance(field, Selection):
+                a = getattr(MO_class, field.name)
+                print a
+
         try:
             id = Block.mapfield_to_dict(self.identity, request.PARAMS, request.cms)
             o = MO_class.objects.get(**id)
