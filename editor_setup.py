@@ -88,7 +88,7 @@ f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Url',
                     identity={'site': 'cms.site.id', 'url': 'url'},
                     next_page='pages',
                     fields=[Input(name='url', label='URL'),
-                            Input(name='page', label='Page Type'),
+                            Input(name='page', label='Page Type', name_field='name', value_field='id'),
                             Input(name='submit', type='submit', html_class='btn')])
 f.save()
 l = Layout()

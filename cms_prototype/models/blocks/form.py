@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pyramid.httpexceptions import HTTPFound
 from mongoengine import BooleanField, IntField, ListField, StringField, MapField
 from mongoengine import EmbeddedDocument, EmbeddedDocumentField
@@ -25,10 +26,10 @@ class Checkbox(Input):
     checked = BooleanField(default=False)
 
 
-class Selection(Input):
+class Select(Input):
     def __init__(self, *args, **kwargs):
-        kwargs['type'] = 'selection'
-        super(Selection, self).__init__(*args, **kwargs)
+        kwargs['type'] = 'select'
+        super(Select, self).__init__(*args, **kwargs)
 
     name_field = StringField(required=True)
     value_field = StringField(required=True)
@@ -42,6 +43,17 @@ class Form(Block):
     next_page = StringField()
 
     meta = {'renderer': '/blocks/form.jade'}
+
+    def to_mongo(self, include_new_params=True):
+        o = super(Form, self).to_mongo()
+        if include_new_params:
+            for pos, f in enumerate(self.fields):
+                if 'value' in f:
+                    o['fields'][pos]['value'] = f.value
+                if 'options' in f:
+                    o['fields'][pos]['options'] = f.options
+        print o
+        return o
 
 
 class MongoEngineForm(Form):
@@ -57,24 +69,25 @@ class MongoEngineForm(Form):
         except Exception, e:
             raise Exception("Cannot handle the mongoengine form: cannot find the class {0} in the module {1}.".format(mod, cls))
 
-    def to_mongo(self):
-        o = super(MongoEngineForm, self).to_mongo()
-        for pos, f in enumerate(self.fields):
-            if 'value' in f:
-                o['fields'][pos]['value'] = f.value
-        return o
-
     def populate(self, request):
         MO_class = self._get_mongoengine_class()
 
         #process any fields first as we need to which values are acceptable
         for field in self.fields:
-            print field.name
-            print isinstance(field, Selection)
-            if isinstance(field, Selection):
-                a = getattr(MO_class, field.name)
-                print a
+            if isinstance(field, Select):
+                cls = getattr(MO_class, field.name).document_type
+                try:
+                    objs = cls.objects.all()
+                    field.options = []
+                    for o in objs:
+                        option = namedtuple('option', ['name', 'value'])
+                        setattr(option, 'name', getattr(o, field.name_field))
+                        setattr(option, 'value', getattr(o, field.value_field))
+                        field.options.append(option)
+                except DoesNotExist, e:
+                    pass
 
+        #populate values of the fields
         try:
             id = Block.mapfield_to_dict(self.identity, request.PARAMS, request.cms)
             o = MO_class.objects.get(**id)

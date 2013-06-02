@@ -1,7 +1,7 @@
 from collections import namedtuple
 from pyramid.httpexceptions import HTTPFound
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
-from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm, Selection
+from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm, Select
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
 from pyramid import testing
@@ -54,6 +54,19 @@ TEXT_FROM_WITH_VALUE = """
 </form>
 """
 
+select = """
+<form action="" method="POST" class="form-horizontal">
+  <div class="control-group">
+    <div class="controls">
+      <select>
+        <option value="bar">foo</option>
+        <option value="bang">buz</option>
+      </select>
+    </div>
+  </div>
+</form>
+"""
+
 
 class FormRenderTestCase(TemplateTestCase):
     def setUp(self):
@@ -88,6 +101,33 @@ class FormRenderTestCase(TemplateTestCase):
         self.assertEqual(form_b.fields[0].type, 'checkbox')
 
         self.assertEqual(strip_html_whitespace(form_a.render().strip()), strip_html_whitespace(CBOX_HTML))
+
+    def test_select(self):
+        form_a = Form()
+
+        field = Select(name='name', label='Name', name_field='foo', value_field='bar')
+        field.options = []
+        o = namedtuple('option', ['name', 'value'])
+        o.name = 'foo'
+        o.value = 'bar'
+        field.options.append(o)
+        o = namedtuple('option', ['name', 'value'])
+        o.name = 'buz'
+        o.value = 'bang'
+        field.options.append(o)
+
+        form_a.fields.append(field)
+        form_a.save()
+
+        form_a.to_mongo()
+
+        form_b = Form.objects(id=form_a.id).first()
+        self.assertEqual(form_a, form_b)
+        self.assertEqual(form_b.fields[0], field)
+        self.assertEqual(form_b.fields[0].type, 'select')
+
+        self.assertEqual(strip_html_whitespace(form_a.render().strip()),
+                         strip_html_whitespace(select))
 
     def test_no_label_form(self):
         form_a = Form()
@@ -365,6 +405,7 @@ class Populate(TemplateTestCase):
         with self.assertRaises(AttributeError):
             a = f.fields[0].value
 
+
 class Inputs(TemplateTestCase):
     def setUp(self):
         super(Inputs, self).setUp()
@@ -372,16 +413,15 @@ class Inputs(TemplateTestCase):
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
         self.request.PARAMS = {}
 
-    def test_populate_input_selection(self):
+    def test_populate_input_select(self):
         from cms_prototype.models.site import Page
         f = MongoEngineForm(mongo_object_class="cms_prototype.models.site:Url",
-                            fields=[Selection(type='selection', name='page', name_field='name', value_field='id')],
+                            fields=[Select(type='select', name='page', name_field='name', value_field='id')],
                             identity={'site': 'request.cms.site.id'})
         f.save()
 
         f.populate(self.request)
-        with self.assertRaises(AttributeError):
-            a = f.fields[0].options
+        self.assertEqual(len(f.fields[0].options), 0)
 
         f = MongoEngineForm.objects(id=f.id).first()
 
