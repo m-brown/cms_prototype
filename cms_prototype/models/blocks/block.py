@@ -11,7 +11,10 @@ class Block(VersionedDocument):
     meta        = {'allow_inheritance': True}
 
     def render(self, **kwargs):
-        args = {k: v for k, v in self.to_mongo().iteritems() if k[0] != '_'}
+        if hasattr(self, 'serialize'):
+            args = {k: v for k, v in self.serialize().iteritems() if k[0] != '_'}
+        else:
+            args = {k: v for k, v in self.to_mongo().iteritems() if k[0] != '_'}
 
         renderer = self._meta.get('renderer')
         if 'renderer' in kwargs:

@@ -54,10 +54,11 @@ TEXT_FROM_WITH_VALUE = """
 </form>
 """
 
-select = """
+SELECT = """
 <form action="" method="POST" class="form-horizontal">
   <div class="control-group">
     <div class="controls">
+      <label for="name" name="name" class="control-label">Name</label>
       <select>
         <option value="bar">foo</option>
         <option value="bang">buz</option>
@@ -119,15 +120,14 @@ class FormRenderTestCase(TemplateTestCase):
         form_a.fields.append(field)
         form_a.save()
 
-        form_a.to_mongo()
-
         form_b = Form.objects(id=form_a.id).first()
         self.assertEqual(form_a, form_b)
+        self.assertEqual(len(form_b.fields), 1)
         self.assertEqual(form_b.fields[0], field)
         self.assertEqual(form_b.fields[0].type, 'select')
 
         self.assertEqual(strip_html_whitespace(form_a.render().strip()),
-                         strip_html_whitespace(select))
+                         strip_html_whitespace(SELECT))
 
     def test_no_label_form(self):
         form_a = Form()

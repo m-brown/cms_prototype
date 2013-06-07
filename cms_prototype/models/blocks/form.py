@@ -44,15 +44,21 @@ class Form(Block):
 
     meta = {'renderer': '/blocks/form.jade'}
 
-    def to_mongo(self, include_new_params=True):
-        o = super(Form, self).to_mongo()
+    def serialize(self, include_new_params=True):
+        """
+        Similar to to_mongo() but includes the additional
+        parameters created at run time. Primarily used for
+        rendering
+        """
+        o = self.to_mongo()
         if include_new_params:
             for pos, f in enumerate(self.fields):
                 if 'value' in f:
                     o['fields'][pos]['value'] = f.value
                 if 'options' in f:
-                    o['fields'][pos]['options'] = f.options
-        print o
+                    o['fields'][pos]['options'] = []
+                    for opt in f.options:
+                        o['fields'][pos]['options'].append({'name': opt.name, 'value': opt.value})
         return o
 
 

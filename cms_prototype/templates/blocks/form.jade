@@ -15,8 +15,7 @@ form(action="${action}", method="${method}", class="form-horizontal")
                     select(id=field.get('html_id'), class=field.get('html_class'))
                         each opt in field['options']
                             option(value=opt['value'])
-                                $(opt.name)
-                    input(id=field.get('html_id'), class=field.get('html_class'), type="${field['type']}", name="${field['name']}", value=field.get('value'))
+                                ${opt['name']}
         else
             .control-group
                 if ('label' in field)
