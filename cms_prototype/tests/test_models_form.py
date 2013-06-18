@@ -4,6 +4,7 @@ from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 from cms_prototype.models.blocks.form import Form, Input, Checkbox, MongoEngineForm, Select
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
+from cms_prototype.models.site import Site
 from pyramid import testing
 
 
@@ -411,6 +412,8 @@ class Inputs(TemplateTestCase):
         super(Inputs, self).setUp()
         self.request = testing.DummyRequest()
         self.request.cms = namedtuple('cms', ['page', 'site', 'url'])
+        self.request.cms.site = Site(name='test', unique_name='test')
+        self.request.cms.site.save()
         self.request.PARAMS = {}
 
     def test_populate_input_select(self):
@@ -425,11 +428,31 @@ class Inputs(TemplateTestCase):
 
         f = MongoEngineForm.objects(id=f.id).first()
 
-        p = Page(name='test')
+        p = Page(name='test', site=self.request.cms.site)
         p.save()
 
         f.populate(self.request)
 
+        self.assertEqual(len(f.fields[0].options), 1)
+        self.assertEqual(f.fields[0].options[0].value, p.id)
+        self.assertEqual(f.fields[0].options[0].name, p.name)
+
+    def test_populate_input_select_with_restriction(self):
+        from cms_prototype.models.site import Page
+        f = MongoEngineForm(mongo_object_class="cms_prototype.models.site:Url",
+                            fields=[Select(type='select', name='page', name_field='name', value_field='id', identity={'site': 'cms.site.id'})],
+                            identity={'site': 'request.cms.site.id'})
+        f.save()
+
+        p = Page(name='test', site=self.request.cms.site)
+        p.save()
+
+        s = Site(name='foo', unique_name='foo')
+        s.save()
+        p2 = Page(name='foo test', site=s)
+        p2.save()
+
+        f.populate(self.request)
         self.assertEqual(len(f.fields[0].options), 1)
         self.assertEqual(f.fields[0].options[0].value, p.id)
         self.assertEqual(f.fields[0].options[0].name, p.name)

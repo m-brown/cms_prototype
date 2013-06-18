@@ -5,7 +5,7 @@ from cms_prototype.models.site import Site, Page, Url
 from cms_prototype.models.site import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 from cms_prototype.models.blocks.link import Link
-from cms_prototype.models.blocks.form import MongoEngineForm, Input
+from cms_prototype.models.blocks.form import MongoEngineForm, Input, Select
 from cms_prototype.models.blocks.table import MongoEngineTable, MongoColumn
 
 
@@ -88,9 +88,11 @@ f = MongoEngineForm(mongo_object_class='cms_prototype.models.site:Url',
                     identity={'site': 'cms.site.id', 'url': 'url'},
                     next_page='pages',
                     fields=[Input(name='url', label='URL'),
-                            Input(name='page', label='Page Type', name_field='name', value_field='id'),
+                            Input(name='site', type='hidden', default='cms.site.id'),
+                            Select(name='page', label='Page Type', name_field='name', value_field='id', identity={'site': 'cms.site.id'}),
                             Input(name='submit', type='submit', html_class='btn')])
 f.save()
+raise Exception(" error")
 l = Layout()
 l.items.append(f)
 p = Page(name='Create URL', layout=l)

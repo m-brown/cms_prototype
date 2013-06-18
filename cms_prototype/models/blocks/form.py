@@ -33,6 +33,7 @@ class Select(Input):
 
     name_field = StringField(required=True)
     value_field = StringField(required=True)
+    identity = MapField(field=StringField())
     sort_by = StringField()
 
 
@@ -83,7 +84,11 @@ class MongoEngineForm(Form):
             if isinstance(field, Select):
                 cls = getattr(MO_class, field.name).document_type
                 try:
-                    objs = cls.objects.all()
+                    if len(field.identity):
+                        id = Block.mapfield_to_dict(field.identity, request.PARAMS, request.cms)
+                        objs = cls.objects.get(**id)
+                    else:
+                        objs = cls.objects.all()
                     field.options = []
                     for o in objs:
                         option = namedtuple('option', ['name', 'value'])
