@@ -2,7 +2,7 @@ from collections import namedtuple
 from pyramid import testing
 from cms_prototype.tests.common import TemplateTestCase, strip_html_whitespace
 from cms_prototype.models.page_handler import PageHandler
-from cms_prototype.models.site import Page, Url
+from cms_prototype.models.site import Page, Url, Site
 from cms_prototype.models.layout import Layout
 from cms_prototype.models.blocks.text import HTMLBlock
 
@@ -60,11 +60,13 @@ class PostProcessHandler(PageHandler):
 class Handler(TemplateTestCase):
     def setUp(self):
         super(TemplateTestCase, self).setUp()
+        s = Site(name='test', unique_name='test')
+        s.save()
         b = HTMLBlock(text='foo')
         b.save()
         l = Layout()
         l.items.append(b)
-        self.p = Page(name='test', layout=l)
+        self.p = Page(name='test', layout=l, site=s)
         self.p.save()
 
         self.request = testing.DummyRequest()

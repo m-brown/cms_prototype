@@ -86,7 +86,7 @@ class MongoEngineForm(Form):
                 try:
                     if len(field.identity):
                         id = Block.mapfield_to_dict(field.identity, request.PARAMS, request.cms)
-                        objs = cls.objects.get(**id)
+                        objs = cls.objects(**id)
                     else:
                         objs = cls.objects.all()
                     field.options = []

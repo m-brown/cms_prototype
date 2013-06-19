@@ -14,7 +14,7 @@ class PageloadTest(TemplateTestCase):
 
         site = Site(name='test', unique_name='test')
         site.save()
-        page = Page(name='test')
+        page = Page(name='test', site=site)
         page.save()
         url = Url(site=site, url='index.html', page=page)
         url.save()
@@ -76,7 +76,7 @@ class PageloadTest(TemplateTestCase):
 
         request = testing.DummyRequest(matchdict={'site_unique_name': 'test', 'url': 'edtest'})
         
-        page = Page(name='foo')
+        page = Page(name='foo', site=site)
         page.save()
         url = Url(site=site, page=page, url='edtest')
         url.save()
@@ -96,7 +96,7 @@ class PageHandlerLoadTest(TemplateTestCase):
 
         site = Site(name='test', unique_name='test')
         site.save()
-        page = Page(name='test', handler_module='cms_prototype.tests.test_page', handler_class='DummyHandler')
+        page = Page(name='test', site=site, handler_module='cms_prototype.tests.test_page', handler_class='DummyHandler')
         page.save()
         url = Url(site=site, url='index.html', page=page)
         url.save()

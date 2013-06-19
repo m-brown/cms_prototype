@@ -134,7 +134,7 @@ class MongoEngineTableTest(TemplateTestCase):
 
         s = Site(name='foo', unique_name='bar')
         s.save()
-        p = Page(name='test')
+        p = Page(name='test', site=s)
         p.save()
         self.request.cms.site = s
 
